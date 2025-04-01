@@ -1,0 +1,42 @@
+﻿<Window x:Class="Profisys_Programming_Task.View.Dialog.DocumentsItemDialogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Profisys_Programming_Task.View.Dialog"
+        mc:Ignorable="d"
+            Title="DocumentsItemDialogView" Height="450" Width="800">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <Label FontSize="24" HorizontalAlignment="Center" Margin="5">Current dcoument</Label>
+            <DataGrid Height="50" Margin="10"
+              ItemsSource="{Binding CurrentDocument}" 
+              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+              AutoGenerateColumns="True">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="15*"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='yyyy-MM-dd'}" Width="15*"/>
+                    <DataGridTextColumn Header="First name" Binding="{Binding FirstName}" Width="23*"/>
+                    <DataGridTextColumn Header="Last name" Binding="{Binding LastName}" Width="22*"/>
+                    <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Label FontSize="24" HorizontalAlignment="Center" Margin="5">Items</Label>
+            <DataGrid Height="200" Margin="10"
+            ItemsSource="{Binding Items}" 
+            CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+            AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Ordinal}" Width="5*"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Product}" Width="15*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Quantity}" Width="15*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Price}" Width="15*"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding TaxRate}" Width="15*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Height="20" Width="50" Command="{Binding CloseDialogCommand}">Close</Button>
+        </StackPanel>
+    </Grid>
+</Window>

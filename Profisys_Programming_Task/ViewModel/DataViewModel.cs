@@ -9,6 +9,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Profisys_Programming_Task.Model;
+using Profisys_Programming_Task.View.Dialog;
+using Profisys_Programming_Task.ViewModel.DialogViewModel;
 
 namespace Profisys_Programming_Task.ViewModel
 {
@@ -56,7 +58,12 @@ namespace Profisys_Programming_Task.ViewModel
         {
             if (_selectedDocument != null)
             {
-                // to do
+                var detailsDialog = new DocumentsItemDialogView();
+                var detailsDialogViewModel = new DocumentsItemDialogViewModel(_appDbContext, _selectedDocument, detailsDialog);
+                detailsDialog.DataContext = detailsDialogViewModel;
+
+                detailsDialogViewModel.LoadItems();
+                detailsDialog.ShowDialog();
             }
         }
         private bool CanShowDocumentDetails()
