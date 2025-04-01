@@ -5,8 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Profisys_Programming_Task.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="650" d:DesignWidth="1200">
+
+    <Grid Background="white">
+        <StackPanel VerticalAlignment="Center">
+            <Label FontSize="42" HorizontalAlignment="Center" Margin="0,0,0,30">MAIN MENU</Label>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Width="150" Height="75" FontSize="16" Command="{Binding GoToDataViewCommand}">View Data</Button>
+                <Button Width="150" Height="75" FontSize="16" Margin="50, 0, 0,0" Command="{Binding GoToImportViewCommand}">Import data</Button>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>
