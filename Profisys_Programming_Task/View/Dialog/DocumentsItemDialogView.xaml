@@ -12,7 +12,7 @@
             <DataGrid Height="50" Margin="10"
               ItemsSource="{Binding CurrentDocument}" 
               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-              AutoGenerateColumns="True">
+              AutoGenerateColumns="False">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
