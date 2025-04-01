@@ -5,8 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Profisys_Programming_Task.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="650" d:DesignWidth="1200">
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="80*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding BackToMenuCommand}">Back to menu</Button>
+        <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Right" Command="{Binding ShowDocumentDetailsCommand}">
+            <TextBlock >Show document items</TextBlock>
+        </Button>
+        <DataGrid Grid.Row="1" Margin="15"
+              ItemsSource="{Binding _Documents}"
+              SelectedItem="{Binding SelectedDocument}"
+              SelectionUnit="FullRow"
+              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+              AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="15*"/>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="15*"/>
+                <DataGridTextColumn Header="First name" Binding="{Binding FirstName}" Width="23*"/>
+                <DataGridTextColumn Header="Last name" Binding="{Binding LastName}" Width="22*"/>
+                <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
+            </DataGrid.Columns>
+
+        </DataGrid>
     </Grid>
 </UserControl>
