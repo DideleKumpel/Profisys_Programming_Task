@@ -10,13 +10,56 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="20*"></RowDefinition>
+            <RowDefinition Height="10*"></RowDefinition>
             <RowDefinition Height="80*"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding BackToMenuCommand}">Back to menu</Button>
         <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Right" Command="{Binding ShowDocumentDetailsCommand}">
             <TextBlock >Show document items</TextBlock>
         </Button>
-        <DataGrid Grid.Row="1" Margin="15"
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Panel.ZIndex="2">
+            <Expander Margin="0,5" Header="Filters" Panel.ZIndex="3">
+                <Canvas>
+                    <Border BorderThickness="2" BorderBrush="Black">
+                        <Grid Width="700" Height="130" Background="White">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70*"/>
+                                <RowDefinition Height="30*"/>
+                            </Grid.RowDefinitions>
+                            <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2"></Rectangle>
+                            <StackPanel Margin="10" Grid.RowSpan="2">
+                                <TextBlock FontSize="12">Type:</TextBlock>
+                                <ComboBox ItemsSource="{Binding _documentTypes}" SelectedItem="{Binding SelectedDocumentType, Mode=TwoWay}"/>
+                                <TextBlock FontSize="12">First name:</TextBlock>
+                                <TextBox Text="{Binding FirstNameFilter,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock FontSize="12">Last name:</TextBlock>
+                                <TextBox Text="{Binding LastNameFilter,UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Margin="10" Grid.Column="1">
+                                <TextBlock FontSize="12">City:</TextBlock>
+                                <TextBox Text="{Binding CityFilter,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock FontSize="12">Date:</TextBlock>
+                                <StackPanel Orientation="Horizontal">
+                                    <DatePicker Width="150" Text="{Binding StartDateFilter, Mode=TwoWay}"/>
+                                    <TextBlock >-</TextBlock>
+                                    <DatePicker Width="150" Text="{Binding EndDateFilter, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel  Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,3">
+                                <Button Width="60" Height="30" HorizontalAlignment="Right" Margin="10,0" Command="{Binding ApplayFiltersCommand}">Save</Button>
+                                <Button Width="60" Height="30" HorizontalAlignment="Right" Margin="10,0" Command="{Binding ClearFiltersCommand}">Reset</Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Canvas>
+            </Expander>
+            <Button Height="30" Margin="30,0,0,0" Command="{Binding RefreshDataCommand}">Resfresh data</Button>
+        </StackPanel>
+        <DataGrid Grid.Row="2" Margin="15"
               ItemsSource="{Binding _Documents}"
               SelectedItem="{Binding SelectedDocument}"
               SelectionUnit="FullRow"

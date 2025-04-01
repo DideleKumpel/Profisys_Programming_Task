@@ -45,7 +45,7 @@ namespace Profisys_Programming_Task.ViewModel
         private async Task SwitchToDataView()
         {
             DataViewModel dataViewModel = new DataViewModel(_appDbContext);
-            await dataViewModel.LoadDocuments();
+            await dataViewModel.LoadDocumentsAsync();
             Application.Current.MainWindow.DataContext = dataViewModel;
         }
     }
