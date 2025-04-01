@@ -20,7 +20,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ChooseFileCommand}">Choose file</Button>
-                <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ImportCommand}">Import</Button>
+                <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ImportDataCommand}">Import</Button>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="10">

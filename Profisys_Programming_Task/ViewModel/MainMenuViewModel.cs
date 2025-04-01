@@ -46,7 +46,7 @@ namespace Profisys_Programming_Task.ViewModel
 
         private void SwitchToImportView()
         {
-            Application.Current.MainWindow.DataContext = new ImportViewModel();
+            Application.Current.MainWindow.DataContext = new ImportViewModel(_appDbContext);
         }
 
         private async Task SwitchToDataView()
