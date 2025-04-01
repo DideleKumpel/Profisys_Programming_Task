@@ -4,9 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Profisys_Programming_Task"
+        xmlns:viewmodels="clr-namespace:Profisys_Programming_Task.ViewModel"
+        xmlns:views="clr-namespace:Profisys_Programming_Task.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="650" Width="1200">
+    <Window.Resources>
+        <DataTemplate x:Name="MainMenuViewTemplate" DataType="{x:Type viewmodels:MainMenuViewModel}">
+            <views:MainMenuView DataContext="{Binding }"/>
+        </DataTemplate>
+        <DataTemplate x:Name="DataViewTemplate" DataType="{x:Type viewmodels:DataViewModel}">
+            <views:DataView DataContext="{Binding }"/>
+        </DataTemplate>
+        <DataTemplate x:Name="ImportViewTemplate" DataType="{x:Type viewmodels:ImportViewModel}">
+            <views:ImportView DataContext="{Binding }"/>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
-
+        <ContentControl Content="{Binding}"/>
     </Grid>
 </Window>
