@@ -16,7 +16,14 @@ namespace Profisys_Programming_Task.ViewModel
         public AsyncRelayCommand GoToDataViewCommand { get; }
         public MainMenuViewModel()
         {
-            _appDbContext = new AppDbContext();
+            try
+            {
+                _appDbContext = new AppDbContext();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Could not connect to the database. Please check your connection and try again.");
+            }
             GoToDataViewCommand = new AsyncRelayCommand(SwitchToDataView);
             GoToImportViewCommand = new RelayCommand(SwitchToImportView);
 

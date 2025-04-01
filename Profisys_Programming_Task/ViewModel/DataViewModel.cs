@@ -187,7 +187,7 @@ namespace Profisys_Programming_Task.ViewModel
         }
         public void SwitchToMainMenu()
         {
-            Application.Current.MainWindow.DataContext = new MainMenuViewModel();
+            Application.Current.MainWindow.DataContext = new MainMenuViewModel(_appDbContext);
         }
 
         private void ShowDocumentDetails()
