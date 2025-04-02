@@ -126,7 +126,7 @@ namespace Profisys_Programming_Task.ViewModel
                     DocumetnsDataGridVisibility = "Visible";
                     OnPropertyChanged(nameof (DocumentItemsDataGridVisibility));
                     OnPropertyChanged(nameof (DocumetnsDataGridVisibility));
-                    //Todo
+                    await ImportDocuments(csv, _cancellationTokenSource.Token, _abortImportToken.Token);
                 }
                 else if (headers.Contains("DocumentId") && headers.Contains("Ordinal") && headers.Contains("Product") && headers.Contains("Quantity") && headers.Contains("Price") && headers.Contains("TaxRate")) //document items table
                 {
@@ -160,7 +160,6 @@ namespace Profisys_Programming_Task.ViewModel
             ObservableCollection<DocumentItems> importedItems = new ObservableCollection<DocumentItems>();
             int errorCount = 0;
             ImportProgress = 0;
-            bool ImportCanceled = false; 
 
             double RowUpdateProgressBar = 100.0 / File.ReadLines(FilePath).Count() ;  //count how many procent is one row inport  
             ImportedDocumentItems = importedItems; //select current DataGrid source
@@ -215,7 +214,83 @@ namespace Profisys_Programming_Task.ViewModel
                 MessageBox.Show($"Import ended with succes.");
             }
         }
+        private async Task ImportDocuments(CsvReader csv, CancellationToken cancellationToken, CancellationToken abortImportToken)
+        {
+            ObservableCollection<Documents> importedItems = new ObservableCollection<Documents>();
+            int errorCount = 0;
+            ImportProgress = 0;
 
+            double RowUpdateProgressBar = 100.0 / File.ReadLines(FilePath).Count();  //count how many procent is one row inport  
+            ImportedDocuments = importedItems; //select current DataGrid source
+            OnPropertyChanged(nameof(ImportedDocuments));
+            
+            using (var transaction = await _appDbContext.Database.BeginTransactionAsync()) // Start transaction
+            {
+                try
+                {
+                    await _appDbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Documents ON;");
+                    while (await csv.ReadAsync())
+                    {
+                        try
+                        {
+                            if (cancellationToken.IsCancellationRequested)    // Check if cancellation has been requested
+                            {
+                                MessageBox.Show("Import has been cancelled.");
+                                return; // Exit the method if the import is cancelled without saving
+                            }
+                            if (abortImportToken.IsCancellationRequested)
+                            {
+                                MessageBox.Show("Import has been aborted.");
+                                break; // Import
+                            }
+                            ImportProgress += RowUpdateProgressBar;
+                            OnPropertyChanged(nameof(ImportProgress));
+                            Documents item = csv.GetRecord<Documents>();
+                            if (await _appDbContext.Documents.FirstOrDefaultAsync(i => i.Id == item.Id) == null)
+                            {
+                                await _appDbContext.Documents.AddAsync(item);
+                                importedItems.Add(item);
+                                OnPropertyChanged(nameof(importedItems));
+                            }
+                            else
+                            {
+                                throw new Exception();
+                            }
+
+                        }
+                        catch (OperationCanceledException)
+                        {
+                           MessageBox.Show("Import has been cancelled.");
+                           return; // Exit the loop if the import is cancelled
+                        }
+                        catch
+                        {
+                            errorCount++;
+                        }
+                    }
+                    await _appDbContext.SaveChangesAsync(); // Save all records at once
+                    await _appDbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Documents OFF;");
+
+                    await transaction.CommitAsync(); // Commit transaction
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(); // Rollback if an error occurs
+                    MessageBox.Show($"Import failed: {ex.Message}");
+                    return;
+                }
+            }
+            ImportProgress = 100;
+            OnPropertyChanged(nameof(ImportProgress));
+            if (errorCount > 0)
+            {
+                MessageBox.Show($"Import ended with {errorCount} errors.");
+            }
+            else
+            {
+                MessageBox.Show($"Import ended with succes.");
+            }
+        }
         private bool CanImport()
         {
             if (FilePath.IsNullOrEmpty() && !IsImporting)

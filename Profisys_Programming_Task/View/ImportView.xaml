@@ -57,7 +57,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
                 <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="15*"/>
-                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="15*"/>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='yyyy-MM-dd'}" Width="15*"/>
                 <DataGridTextColumn Header="First name" Binding="{Binding FirstName}" Width="23*"/>
                 <DataGridTextColumn Header="Last name" Binding="{Binding LastName}" Width="22*"/>
                 <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
