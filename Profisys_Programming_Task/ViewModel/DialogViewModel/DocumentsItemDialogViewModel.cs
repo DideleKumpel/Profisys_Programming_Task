@@ -19,9 +19,22 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
         public ObservableCollection<Documents> CurrentDocument { get; set; }
         public ObservableCollection<DocumentItems> Items { get; set; }
 
+        private DocumentItems _selectedItem;
+        public DocumentItems SelectedItem
+        {
+            get { return _selectedItem; }
+            set
+            {
+                _selectedItem = value;
+                OnPropertyChanged(nameof(SelectedItem));
+                DeleteItemCommand.NotifyCanExecuteChanged();
+            }
+        }
+
         private Window _dialog;
 
         public RelayCommand CloseDialogCommand { get; }
+        public AsyncRelayCommand DeleteItemCommand { get; }
 
         public DocumentsItemDialogViewModel(AppDbContext appDbContext, Documents Document, Window dialog)
         {
@@ -31,9 +44,10 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
             OnPropertyChanged(nameof(CurrentDocument));
 
             CloseDialogCommand = new RelayCommand(CloseDialog);
+            DeleteItemCommand = new AsyncRelayCommand(DeleteItemAsyn, IsItemSelected);
         }
 
-        public async Task LoadItems()
+        public async Task LoadItemsAsync()
         {
             try
             {
@@ -45,6 +59,43 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
             {
                 MessageBox.Show("Could not connect to the database. Please check your connection and try again.");
                 CloseDialog();
+            }
+        }
+
+        public async Task DeleteItemAsyn()
+        {
+            if (SelectedItem != null) {
+                string message = $"Are you sure you want to delete this item?\n\n" +
+                                    $"Product: {SelectedItem.Product}\n" +
+                                    $"Quantity: {SelectedItem.Quantity}\n" +
+                                    $"Price: {SelectedItem.Price}\n" +
+                                    $"Tax Rate: {SelectedItem.TaxRate}%";
+
+                var result = MessageBox.Show(message, "Confirmation",MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.OK)
+                {
+                    _appDbContext.DocumentItems.Remove(SelectedItem);
+                    await _appDbContext.SaveChangesAsync();
+                    MessageBox.Show("Item deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoadItemsAsync();
+                }
+                else
+                {
+                    return; // Exit function if Cancel is clicked
+                }
+            }
+        }
+
+        public bool IsItemSelected()
+        {
+            if (SelectedItem == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 

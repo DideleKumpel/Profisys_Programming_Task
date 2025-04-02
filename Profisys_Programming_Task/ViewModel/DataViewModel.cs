@@ -198,7 +198,7 @@ namespace Profisys_Programming_Task.ViewModel
                 var detailsDialogViewModel = new DocumentsItemDialogViewModel(_appDbContext, _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
-                detailsDialogViewModel.LoadItems();
+                detailsDialogViewModel.LoadItemsAsync();
                 detailsDialog.ShowDialog();
             }
         }

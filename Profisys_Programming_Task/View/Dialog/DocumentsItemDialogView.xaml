@@ -25,9 +25,10 @@
             </DataGrid>
             <Label FontSize="24" HorizontalAlignment="Center" Margin="5">Items</Label>
             <DataGrid Height="200" Margin="10"
-            ItemsSource="{Binding Items}" 
-            CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-            AutoGenerateColumns="False">
+                ItemsSource="{Binding Items}" 
+                SelectedItem="{Binding SelectedItem}"
+                CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                AutoGenerateColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
                     <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
@@ -36,7 +37,10 @@
                     <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Height="20" Width="50" Command="{Binding CloseDialogCommand}">Close</Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Height="20" Width="50" Command="{Binding DeleteItemCommand}">Delete</Button>
+                <Button Height="20" Width="50" Margin="15,0,0,0" Command="{Binding CloseDialogCommand}">Close</Button>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
