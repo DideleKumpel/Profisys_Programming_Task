@@ -25,6 +25,5 @@ namespace Profisys_Programming_Task.Model
         [Required]
         public int TaxRate { get; set; }
 
-        public Documents Document { get; set; }
     }
 }

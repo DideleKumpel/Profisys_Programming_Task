@@ -24,12 +24,13 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="10">
-            <ProgressBar Value="{Binding Progress}" Height="20"/>
+            <ProgressBar Value="{Binding ImportProgress}" Height="20"/>
             <StackPanel>
                 <Button Height="25" Width="50" Margin="5">Cancel</Button>
             </StackPanel>
         </StackPanel>
-        <DataGrid Grid.Row="2" Margin="5">
+        <DataGrid Grid.Row="2" Margin="5"
+                  ItemsSource="{Binding _currentDataGridSource}">
             
         </DataGrid>
     </Grid>

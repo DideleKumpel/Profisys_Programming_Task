@@ -14,6 +14,10 @@ using CsvHelper;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.Reflection.Metadata;
+using Profisys_Programming_Task.Model;
+using System.Diagnostics;
 
 namespace Profisys_Programming_Task.ViewModel
 {
@@ -24,8 +28,11 @@ namespace Profisys_Programming_Task.ViewModel
 
         //DATA FOR IMPORT
         public string FilePath { get; set; }
-        public string IsImporting { get; set; }
-        public double ImportProgress { get; }
+        public bool IsImporting { get; set; }
+        public double ImportProgress { get; set; }
+
+        //DATAGRID
+        public object? _currentDataGridSource { get; set; }
 
         //COMMAND
         public RelayCommand BackToMenuCommand { get; }
@@ -38,10 +45,12 @@ namespace Profisys_Programming_Task.ViewModel
         {
             _appDbContext = appDbContext;
 
+            IsImporting = false;
+
             //COMMENDS
-            BackToMenuCommand = new RelayCommand(BackToMenu);
-            ChooseFileCommand = new RelayCommand(ChooseFile);
-            ImportDataCommand = new AsyncRelayCommand(ProccesCsvAsycn, FileIsChoosen);
+            BackToMenuCommand = new RelayCommand(BackToMenu, IsNotImporting);
+            ChooseFileCommand = new RelayCommand(ChooseFile, IsNotImporting);
+            ImportDataCommand = new AsyncRelayCommand(ProccesCsvAsycn, CanImport);
         }
         
 
@@ -75,22 +84,31 @@ namespace Profisys_Programming_Task.ViewModel
         {
             try
             {
-                using var reader = new StreamReader(FilePath);
-                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                IsImporting = true; //flag up
+                OnPropertyChanged(nameof(IsImporting));
+                //disable button for import time
+                BackToMenuCommand.NotifyCanExecuteChanged();
+                ChooseFileCommand.NotifyCanExecuteChanged();
+                ImportDataCommand.NotifyCanExecuteChanged();
+
+                using StreamReader reader = new StreamReader(FilePath);
+                using CsvReader csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.GetCultureInfo("pl-PL"))
                 {
-                    HasHeaderRecord = true
+                    HasHeaderRecord = true,
+                    MissingFieldFound = null, //DocumentItem model has Id that isint present in CSV file
+                    Delimiter = ";"       //CSV uses ';' as delimiter deafult value for CsvReader is ','
                 });
 
                 csv.Read();
                 csv.ReadHeader();
                 string[] headers = csv.HeaderRecord;
-                if (headers.Contains("Id;Type;Date;FirstName;LastName;City")) //documents table
+                if (headers.Contains("Id") && headers.Contains("Type") && headers.Contains("Date") && headers.Contains("FirstName") && headers.Contains("LastName") && headers.Contains("City")) //documents table
                 {
                     //Todo
                 }
-                else if (headers.Contains("DocumentId;Ordinal;Product;Quantity;Price;TaxRate")) //document items table
+                else if (headers.Contains("DocumentId") && headers.Contains("Ordinal") && headers.Contains("Product") && headers.Contains("Quantity") && headers.Contains("Price") && headers.Contains("TaxRate")) //document items table
                 {
-                    //toDo
+                    await ImportDocumentItems(csv);
                 }
                 else
                 {
@@ -101,16 +119,63 @@ namespace Profisys_Programming_Task.ViewModel
             {
                 MessageBox.Show($"Import error: {ex.Message}");
             }
+            IsImporting = false; //flag up
+            OnPropertyChanged(nameof(IsImporting));
         }
 
-
-
-        private bool FileIsChoosen()
+        private async Task ImportDocumentItems(CsvReader csv)
         {
-            if (FilePath.IsNullOrEmpty())
+            ObservableCollection<DocumentItems> importedItems = new ObservableCollection<DocumentItems>();
+            int errorCount = 0;
+            ImportProgress = 0;
+
+            double RowUpdateProgressBar = 100.0 / File.ReadLines(FilePath).Count() ;  //count how many procent is one row inport  
+            _currentDataGridSource = importedItems; //select current DataGrid source
+            OnPropertyChanged(nameof(_currentDataGridSource));
+            while (await csv.ReadAsync())
+            {
+                try
+                {
+                    ImportProgress += RowUpdateProgressBar;
+                    OnPropertyChanged(nameof(ImportProgress));
+                    DocumentItems item = csv.GetRecord<DocumentItems>();
+                    importedItems.Add(item);
+                    //await _appDbContext.DocumentItems.AddAsync(item);
+                    OnPropertyChanged(nameof(importedItems));
+                }
+                catch
+                {
+                    errorCount++;
+                }
+            }
+            ImportProgress = 100;
+            OnPropertyChanged(nameof(ImportProgress));
+            if (errorCount > 0) {
+                MessageBox.Show($"Import ended with {errorCount} errors.");
+            }
+            else
+            {
+                MessageBox.Show($"Import ended with succes.");
+            }
+        }
+
+        private bool CanImport()
+        {
+            if (FilePath.IsNullOrEmpty() && !IsImporting)
             {
                 return false;
             }else
+            {
+                return true;
+            }
+        }
+        private bool IsNotImporting()
+        {
+            if (IsImporting)
+            {
+                return false;
+            }
+            else
             {
                 return true;
             }

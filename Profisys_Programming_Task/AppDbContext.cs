@@ -27,7 +27,7 @@ namespace Profisys_Programming_Task
                 .HasConversion<string>();
 
             modelBuilder.Entity<DocumentItems>()
-                .HasOne(d => d.Document)
+                .HasOne<Documents>()
                 .WithMany()
                 .HasForeignKey(d => d.DocumentId)
                 .OnDelete(DeleteBehavior.Restrict);
