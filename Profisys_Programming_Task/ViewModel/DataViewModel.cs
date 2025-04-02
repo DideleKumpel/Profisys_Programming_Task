@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -33,6 +34,7 @@ namespace Profisys_Programming_Task.ViewModel
                 {
                     _selectedDocument = value;
                     ShowDocumentDetailsCommand.NotifyCanExecuteChanged();
+                    DeleteDocumentCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -125,6 +127,7 @@ namespace Profisys_Programming_Task.ViewModel
         public AsyncRelayCommand ApplayFiltersCommand { get; }
         public AsyncRelayCommand ClearFiltersCommand { get; }
         public AsyncRelayCommand RefreshDataCommand { get; }
+        public AsyncRelayCommand DeleteDocumentCommand { get; }
 
         //CONSTRUCTOR
         public DataViewModel(AppDbContext appDbContext)
@@ -138,6 +141,7 @@ namespace Profisys_Programming_Task.ViewModel
             ApplayFiltersCommand = new AsyncRelayCommand(ApplayFiltersAsync);
             ClearFiltersCommand = new AsyncRelayCommand(ClearFiltersAsync);
             RefreshDataCommand = new AsyncRelayCommand(RefreshDataAsync);
+            DeleteDocumentCommand = new AsyncRelayCommand(DeleteDocumentAsync, CanShowDocumentDetails);
 
             //Transfer data from enum DocumentType to collection binded to Taks type filter combobox
             _documentTypes = new ObservableCollection<DocumentTypeFilters>(Enum.GetValues(typeof(DocumentTypeFilters)).Cast<DocumentTypeFilters>());
@@ -185,9 +189,45 @@ namespace Profisys_Programming_Task.ViewModel
                 LoadDocumentsAsync();
             }
         }
+
         public void SwitchToMainMenu()
         {
             Application.Current.MainWindow.DataContext = new MainMenuViewModel(_appDbContext);
+        }
+
+        private async Task DeleteDocumentAsync()
+        {
+            if(_selectedDocument != null)
+            {
+                string message = $"Are you sure you want to delete this document?\n\n" +
+                                    $"Id: {_selectedDocument.Id}\n" +
+                                    $"Type: {_selectedDocument.Type}\n" +
+                                    $"First name: {_selectedDocument.FirstName}\n" +
+                                    $"Last name: {_selectedDocument.LastName}\n" +
+                                    $"City: {_selectedDocument.City}";
+
+                var result = MessageBox.Show(message, "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.OK)
+                {
+                    try
+                    {
+                        _appDbContext.DocumentItems.RemoveRange(_appDbContext.DocumentItems.Where(d => d.DocumentId == _selectedDocument.Id)); //Remove all item assigned to document
+                        _appDbContext.Documents.Remove(_selectedDocument);
+                        await _appDbContext.SaveChangesAsync();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Failed to delete Document.");
+                        return;
+                    }
+                    MessageBox.Show("Document deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RefreshDataAsync();
+                }
+                else
+                {
+                    return; // Exit function if Cancel is clicked
+                }
+            }
         }
 
         private void ShowDocumentDetails()

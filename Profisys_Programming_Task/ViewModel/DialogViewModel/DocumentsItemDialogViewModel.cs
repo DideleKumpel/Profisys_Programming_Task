@@ -75,8 +75,14 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
 
                 if (result == MessageBoxResult.OK)
                 {
-                    _appDbContext.DocumentItems.Remove(SelectedItem);
-                    await _appDbContext.SaveChangesAsync();
+                    try
+                    {
+                        _appDbContext.DocumentItems.Remove(SelectedItem);
+                        await _appDbContext.SaveChangesAsync();
+                    } catch {
+                        MessageBox.Show("Failed to delete item.");
+                        return;
+                    }
                     MessageBox.Show("Item deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoadItemsAsync();
                 }

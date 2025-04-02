@@ -14,9 +14,14 @@
             <RowDefinition Height="70*"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding BackToMenuCommand}">Back to menu</Button>
-        <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Right" Command="{Binding ShowDocumentDetailsCommand}">
-            <TextBlock >Show document items</TextBlock>
-        </Button>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Height="75" Width="150" Margin="10" Command="{Binding DeleteDocumentCommand}">Delete document</Button>
+            <Button Height="75" Width="150" Margin="10"  Command="{Binding ShowDocumentDetailsCommand}">
+                <TextBlock >Show document items</TextBlock>
+            </Button>
+        </StackPanel>
+            
+  
         <StackPanel Grid.Row="1" Orientation="Horizontal" Panel.ZIndex="2">
             <Expander Margin="0,5" Header="Filters" Panel.ZIndex="3">
                 <Canvas>
