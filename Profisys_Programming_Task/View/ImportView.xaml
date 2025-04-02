@@ -26,7 +26,10 @@
         <StackPanel Grid.Row="1" Margin="10,0">
             <Label FontSize="13" HorizontalAlignment="Center">Import progress</Label>
             <ProgressBar Value="{Binding ImportProgress}" Height="20"/>
-            <Button Height="25" Width="50" Margin="5" Command="{Binding CancelImportCommand}">Cancel</Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Height="25" Width="50" Margin="5" Command="{Binding CancelImportCommand}">Cancel</Button>
+                <Button Height="25" Width="50" Margin="5" Command="{Binding AbortImportCommand}">Abort</Button>
+            </StackPanel>
             <Label FontSize="13" HorizontalAlignment="Center">Data inserted to cloud</Label>
         </StackPanel>
         <!-- DataGrid for DocumentItems -->

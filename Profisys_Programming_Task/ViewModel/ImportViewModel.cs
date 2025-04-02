@@ -19,6 +19,7 @@ using System.Reflection.Metadata;
 using Profisys_Programming_Task.Model;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace Profisys_Programming_Task.ViewModel
 {
@@ -32,6 +33,7 @@ namespace Profisys_Programming_Task.ViewModel
         public bool IsImporting { get; set; }
         public double ImportProgress { get; set; }
         private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _abortImportToken;
 
         //DATAGRID
         public string DocumetnsDataGridVisibility { get; set; }
@@ -44,6 +46,7 @@ namespace Profisys_Programming_Task.ViewModel
         public RelayCommand ChooseFileCommand { get; }
         public AsyncRelayCommand ImportDataCommand { get; }
         public RelayCommand CancelImportCommand { get; }
+        public RelayCommand AbortImportCommand { get; }
 
         //CONSTRUCTOR
         public ImportViewModel(AppDbContext appDbContext)
@@ -60,6 +63,7 @@ namespace Profisys_Programming_Task.ViewModel
             ChooseFileCommand = new RelayCommand(ChooseFile, IsNotImporting);
             ImportDataCommand = new AsyncRelayCommand(ProccesCsvAsycn, CanImport);
             CancelImportCommand = new RelayCommand(CancelImport, CanCancelImporting);
+            AbortImportCommand = new RelayCommand(AbortImport, CanCancelImporting);
         }
         
 
@@ -96,11 +100,13 @@ namespace Profisys_Programming_Task.ViewModel
                 IsImporting = true; //flag up
                 OnPropertyChanged(nameof(IsImporting));
                 _cancellationTokenSource = new CancellationTokenSource();  // initialize the cancellation token
+                _abortImportToken = new CancellationTokenSource();
                 //disable button for import time
                 BackToMenuCommand.NotifyCanExecuteChanged();
                 ChooseFileCommand.NotifyCanExecuteChanged();
                 ImportDataCommand.NotifyCanExecuteChanged();
                 CancelImportCommand.NotifyCanExecuteChanged();
+                AbortImportCommand.NotifyCanExecuteChanged();
 
                 using StreamReader reader = new StreamReader(FilePath);
                 using CsvReader csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.GetCultureInfo("pl-PL"))
@@ -129,7 +135,7 @@ namespace Profisys_Programming_Task.ViewModel
                     DocumentItemsDataGridVisibility = "Visible";
                     OnPropertyChanged(nameof(DocumetnsDataGridVisibility));
                     OnPropertyChanged(nameof(DocumentItemsDataGridVisibility));
-                    await ImportDocumentItems(csv, _cancellationTokenSource.Token);
+                    await ImportDocumentItems(csv, _cancellationTokenSource.Token, _abortImportToken.Token);
                 }
                 else
                 {
@@ -142,13 +148,19 @@ namespace Profisys_Programming_Task.ViewModel
             }
             IsImporting = false; //flag down
             OnPropertyChanged(nameof(IsImporting));
+            BackToMenuCommand.NotifyCanExecuteChanged();
+            ChooseFileCommand.NotifyCanExecuteChanged();
+            ImportDataCommand.NotifyCanExecuteChanged();
+            CancelImportCommand.NotifyCanExecuteChanged();
+            AbortImportCommand.NotifyCanExecuteChanged();
         }
 
-        private async Task ImportDocumentItems(CsvReader csv, CancellationToken cancellationToken)
+        private async Task ImportDocumentItems(CsvReader csv, CancellationToken cancellationToken, CancellationToken abortImportToken)
         {
             ObservableCollection<DocumentItems> importedItems = new ObservableCollection<DocumentItems>();
             int errorCount = 0;
             ImportProgress = 0;
+            bool ImportCanceled = false; 
 
             double RowUpdateProgressBar = 100.0 / File.ReadLines(FilePath).Count() ;  //count how many procent is one row inport  
             ImportedDocumentItems = importedItems; //select current DataGrid source
@@ -157,25 +169,42 @@ namespace Profisys_Programming_Task.ViewModel
             {
                 try
                 {
-                    cancellationToken.ThrowIfCancellationRequested();  // Check if cancellation has been requested
+                    if (cancellationToken.IsCancellationRequested)    // Check if cancellation has been requested
+                    {
+                        MessageBox.Show("Import has been cancelled.");
+                        return; // Exit the method if the import is cancelled without saving
+                    }
+                    if (abortImportToken.IsCancellationRequested)
+                    {
+                        MessageBox.Show("Import has been aborted.");
+                        break; // Import
+                    }
                     ImportProgress += RowUpdateProgressBar;
                     OnPropertyChanged(nameof(ImportProgress));
                     DocumentItems item = csv.GetRecord<DocumentItems>();
-                    await _appDbContext.DocumentItems.AddAsync(item);
-                    await _appDbContext.SaveChangesAsync();
-                    importedItems.Add(item);
-                    OnPropertyChanged(nameof(importedItems));
+                    if( await _appDbContext.Documents.FirstOrDefaultAsync( i => i.Id == item.DocumentId) != null)
+                    {
+                        await _appDbContext.DocumentItems.AddAsync(item);
+                        importedItems.Add(item);
+                        OnPropertyChanged(nameof(importedItems));
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                    
                 }
                 catch (OperationCanceledException)
                 {
                     MessageBox.Show("Import has been cancelled.");
-                    break; // Exit the loop if the import is cancelled
+                    return; // Exit the loop if the import is cancelled
                 }
                 catch
                 {
                     errorCount++;
                 }
             }
+            await _appDbContext.SaveChangesAsync();
             ImportProgress = 100;
             OnPropertyChanged(nameof(ImportProgress));
             if (errorCount > 0) {
@@ -213,10 +242,15 @@ namespace Profisys_Programming_Task.ViewModel
             Application.Current.MainWindow.DataContext = new MainMenuViewModel(_appDbContext);
         }
 
-        public void CancelImport()
+        private void CancelImport()
         {
             _cancellationTokenSource?.Cancel();  // Cancel the import operation
         }
+        private void AbortImport()
+        {
+            _abortImportToken?.Cancel();
+        }
+
         private bool CanCancelImporting()
         {
             if (IsImporting)
