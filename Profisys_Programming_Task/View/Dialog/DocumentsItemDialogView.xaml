@@ -29,11 +29,11 @@
             CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
             AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Ordinal}" Width="5*"/>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Product}" Width="15*"/>
-                    <DataGridTextColumn Header="Price" Binding="{Binding Quantity}" Width="15*"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Price}" Width="15*"/>
-                    <DataGridTextColumn Header="Total" Binding="{Binding TaxRate}" Width="15*"/>
+                    <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
+                    <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="15*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="15*"/>
+                    <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
                 </DataGrid.Columns>
             </DataGrid>
             <Button Height="20" Width="50" Command="{Binding CloseDialogCommand}">Close</Button>
