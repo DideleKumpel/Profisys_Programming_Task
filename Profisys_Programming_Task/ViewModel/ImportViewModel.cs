@@ -261,7 +261,9 @@ namespace Profisys_Programming_Task.ViewModel
                         catch (OperationCanceledException)
                         {
                            MessageBox.Show("Import has been cancelled.");
-                           return; // Exit the loop if the import is cancelled
+                            await _appDbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Documents OFF;");
+                            await transaction.RollbackAsync();
+                            return; // Exit the loop if the import is cancelled
                         }
                         catch
                         {
