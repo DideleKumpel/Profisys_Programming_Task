@@ -170,6 +170,7 @@ namespace Profisys_Programming_Task.ViewModel
                 {
                     if (cancellationToken.IsCancellationRequested)    // Check if cancellation has been requested
                     {
+                        _appDbContext.ChangeTracker.Clear();
                         MessageBox.Show("Import has been cancelled.");
                         return; // Exit the method if the import is cancelled without saving
                     }
@@ -191,12 +192,6 @@ namespace Profisys_Programming_Task.ViewModel
                     {
                         throw new Exception();
                     }
-                    
-                }
-                catch (OperationCanceledException)
-                {
-                    MessageBox.Show("Import has been cancelled.");
-                    return; // Exit the loop if the import is cancelled
                 }
                 catch
                 {
@@ -235,6 +230,7 @@ namespace Profisys_Programming_Task.ViewModel
                         {
                             if (cancellationToken.IsCancellationRequested)    // Check if cancellation has been requested
                             {
+                                _appDbContext.ChangeTracker.Clear();
                                 MessageBox.Show("Import has been cancelled.");
                                 return; // Exit the method if the import is cancelled without saving
                             }
@@ -256,15 +252,8 @@ namespace Profisys_Programming_Task.ViewModel
                             {
                                 throw new Exception();
                             }
+                        }
 
-                        }
-                        catch (OperationCanceledException)
-                        {
-                           MessageBox.Show("Import has been cancelled.");
-                            await _appDbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Documents OFF;");
-                            await transaction.RollbackAsync();
-                            return; // Exit the loop if the import is cancelled
-                        }
                         catch
                         {
                             errorCount++;
