@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Profisys_Programming_Task.Model;
+using System.Net;
+using System.Windows.Documents;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
@@ -7,6 +9,62 @@ namespace Profisys_Programming_Task.Service.DbService
     {
         public DocumentItemsDbService(AppDbContext appDbContext) : base(appDbContext)
         {
+        }
+
+        //Get
+        public override DocumentItems GetById(int id)
+        {
+            DocumentItems documentItemsFound = null;
+            try
+            {
+                documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
+            } catch (Exception ex) {
+                throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
+            }
+            if (documentItemsFound == null)
+            {
+                throw new Exception($"DocumentItems with id {id} not found.");
+            }
+            return documentItemsFound;
+        }
+
+        public override List<DocumentItems> GetAll()
+        {
+
+            List<DocumentItems> documentItemsList = null;
+            try
+            {
+                documentItemsList = _appDbContext.DocumentItems.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error occurred while retrieving DocumentItems. Error: {ex.Message}");
+            }
+            if (documentItemsList == null || documentItemsList.Count == 0)
+            {
+                throw new Exception($"Error occurred while retrieving DocumentItems.");
+            }
+            return documentItemsList;
+        }
+
+        public override bool Exists(int id)
+        {
+            DocumentItems documentItemsFound = null;
+            try
+            {
+                documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
+            }
+            if (documentItemsFound == null)
+            {
+                return false;
+            }
+            else {
+                return true; 
+            }
         }
 
         //Insert
