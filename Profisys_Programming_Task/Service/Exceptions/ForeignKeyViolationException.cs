@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Profisys_Programming_Task.Service.Exeptions
+﻿namespace Profisys_Programming_Task.Service.Exceptions
 {
     internal class ForeignKeyViolationException: DatabaseException
     {

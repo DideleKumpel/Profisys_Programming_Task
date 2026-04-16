@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Profisys_Programming_Task.Service.Exeptions;
+using Profisys_Programming_Task.Service.Exceptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {

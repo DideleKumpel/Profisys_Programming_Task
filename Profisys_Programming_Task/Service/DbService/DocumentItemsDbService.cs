@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Profisys_Programming_Task.Model;
+using Profisys_Programming_Task.Service.Exceptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
@@ -18,13 +19,14 @@ namespace Profisys_Programming_Task.Service.DbService
                 documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
                 if (documentItemsFound == null)
                 {
-                    throw new Exception($"DocumentItems with id {id} not found.");
+                    throw new EntityNotFoundException("DocumentItems", id);
                 }
                 return documentItemsFound;
             }
-            catch (Exception ex)
+            catch (Exception error)
             {
-                throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
+                HandleException(error);
+                throw;
             }
         }
 
@@ -34,9 +36,10 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 return _appDbContext.DocumentItems.ToList();
             }
-            catch (Exception ex)
+            catch (Exception error)
             {
-                throw new Exception($"Error occurred while retrieving DocumentItems. Error: {ex.Message}");
+                HandleException(error);
+                throw;
             }
         }
 
@@ -46,9 +49,10 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 return _appDbContext.DocumentItems.Any(item => item.Id == id);
             }
-            catch (Exception ex)
+            catch (Exception error)
             {
-                throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
+                HandleException(error);
+                throw;
             }
         }
 
@@ -63,7 +67,8 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             catch (Exception error)
             {
-                throw new Exception(message: $"Error ocurred while adding item. Error: {error.Message}");
+                HandleException(error);
+                throw;
             }
             
         }
@@ -85,7 +90,7 @@ namespace Profisys_Programming_Task.Service.DbService
                     if (CancelOnError)
                     {
                         RollbackTransaction();
-                        throw new Exception(message: $"Error ocurred while adding item number {succes + 1}. Error: {error.Message}");
+                        HandleException(error);
                     }
                 }
             }
@@ -108,7 +113,8 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             catch (Exception error)
             {
-                throw new Exception(message: $"Error ocurred while updating item with id {item.Id}. Error: {error.Message}");
+                HandleException(error);
+                return false;
             }
         }
 
@@ -125,15 +131,16 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             catch (Exception error)
             {
-                throw new Exception(message: $"Error ocurred while updating item with id {id}. Error: {error.Message}");
+                HandleException(error);
+                return false;
             }
         }
 
         public override int UpdateMany(List<DocumentItems> items, bool CancelOnError)
         {
-            if (items == null || items.Count == 0)
+            if (items == null)
             {
-                throw new ArgumentException("Items list cannot be null or empty.", nameof(items));
+                throw new ArgumentException(nameof(items));
             }
             BeginTransaction();
             int succes = 0;
@@ -150,7 +157,7 @@ namespace Profisys_Programming_Task.Service.DbService
                     if (CancelOnError)
                     {
                         RollbackTransaction();
-                        throw new Exception(message: $"Error ocurred while updating item with id {item.Id}. Error: {error.Message}");
+                        HandleException(error);
                     }
                 }
             }
@@ -173,7 +180,8 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             catch (Exception error)
             {
-                throw new Exception(message: $"Error ocurred while deleting item with id {item.Id}. Error: {error.Message}");
+                HandleException(error);
+                return false;
             }
         }
 
@@ -185,9 +193,9 @@ namespace Profisys_Programming_Task.Service.DbService
 
         public override int DeleteMany(List<DocumentItems> items, bool CancelOnError)
         {
-            if (items == null || items.Count == 0)
+            if (items == null)
             {
-                throw new ArgumentException("Items list cannot be null or empty.", nameof(items));
+                throw new ArgumentException(nameof(items));
             }
             BeginTransaction();
             int succes = 0;
@@ -204,7 +212,7 @@ namespace Profisys_Programming_Task.Service.DbService
                     if (CancelOnError)
                     {
                         RollbackTransaction();
-                        throw new Exception(message: $"Error ocurred while deleting item with id {item.Id}. Error: {error.Message}");
+                        HandleException(error);
                     }
                 }
             }
