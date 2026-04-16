@@ -18,7 +18,9 @@ namespace Profisys_Programming_Task.Service.DbService
             try
             {
                 documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
             }
             if (documentItemsFound == null)
@@ -62,24 +64,23 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 return false;
             }
-            else {
-                return true; 
+            else
+            {
+                return true;
             }
         }
 
         //Insert
         public override DocumentItems Add(DocumentItems item)
         {
-            BeginTransaction();
             DocumentItems addedItem = new DocumentItems();
             try
             {
                 addedItem = _appDbContext.DocumentItems.Add(item).Entity;
-                CommitTransaction();
+                _appDbContext.SaveChanges();
             }
-            catch(Exception error)
+            catch (Exception error)
             {
-                RollbackTransaction();
                 throw new Exception(message: $"Error ocurred while adding item. Error: {error.Message}");
             }
             return addedItem;
@@ -89,13 +90,14 @@ namespace Profisys_Programming_Task.Service.DbService
         {
             BeginTransaction();
             int succes = 0;
-            foreach (DocumentItems item in items) {
+            foreach (DocumentItems item in items)
+            {
                 try
                 {
-                    _appDbContext.DocumentItems.Add(item);
-                    _appDbContext.SaveChanges();
+                    Add(item);
                     succes++;
-                }catch(Exception error)
+                }
+                catch (Exception error)
                 {
                     _appDbContext.Entry(item).State = EntityState.Detached;
                     if (CancelOnError)
@@ -108,5 +110,137 @@ namespace Profisys_Programming_Task.Service.DbService
             CommitTransaction(false);
             return succes;
         }
+
+        //Update
+        public override bool Update(DocumentItems item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            try
+            {
+                _appDbContext.DocumentItems.Update(item);
+                _appDbContext.SaveChanges();
+                return true;
+            }
+            catch (Exception error)
+            {
+                throw new Exception(message: $"Error ocurred while updating item with id {item.Id}. Error: {error.Message}");
+            }
+        }
+
+        public override bool Update(int id, DocumentItems item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            try
+            {
+                item.Id = id;
+                return Update(item);
+            }
+            catch (Exception error)
+            {
+                throw new Exception(message: $"Error ocurred while updating item with id {id}. Error: {error.Message}");
+            }
+        }
+
+        public override int UpdateMany(List<DocumentItems> items, bool CancelOnError)
+        {
+            if (items == null || items.Count == 0)
+            {
+                throw new ArgumentException("Items list cannot be null or empty.", nameof(items));
+            }
+            BeginTransaction();
+            int succes = 0;
+            foreach (DocumentItems item in items)
+            {
+                try
+                {
+                    if (item == null)
+                    {
+                        throw new ArgumentNullException(nameof(item));
+                    }
+                    Update(item);
+                    succes++;
+                }
+                catch (Exception error)
+                {
+                    _appDbContext.Entry(item).State = EntityState.Unchanged;
+                    if (CancelOnError)
+                    {
+                        RollbackTransaction();
+                        throw new Exception(message: $"Error ocurred while updating item with id {item.Id}. Error: {error.Message}");
+                    }
+                }
+            }
+            CommitTransaction(false);
+            return succes;
+        }
+
+        //Delete
+        public override bool Delete(DocumentItems item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            try
+            {
+                _appDbContext.DocumentItems.Remove(item);
+                _appDbContext.SaveChanges();
+                return true;
+            }
+            catch (Exception error)
+            {
+                throw new Exception(message: $"Error ocurred while deleting item with id {item.Id}. Error: {error.Message}");
+            }
+        }
+
+        public override bool Delete(int id)
+        {
+            DocumentItems itemToDelete = GetById(id);
+            if (itemToDelete == null)
+            {
+                throw new Exception($"DocumentItems with id {id} not found.");
+            }
+            return Delete(itemToDelete);
+        }
+
+        public override int DeleteMany(List<DocumentItems> items, bool CancelOnError)
+        {
+            if (items == null || items.Count == 0)
+            {
+                throw new ArgumentException("Items list cannot be null or empty.", nameof(items));
+            }
+            BeginTransaction();
+            int succes = 0;
+            foreach (DocumentItems item in items)
+            {
+                try
+                {
+                    if (item == null)
+                    {
+                        throw new ArgumentNullException(nameof(item));
+                    }
+                    Delete(item);
+                    succes++;
+                }
+                catch (Exception error)
+                {
+                    _appDbContext.Entry(item).State = EntityState.Unchanged;
+                    if (CancelOnError)
+                    {
+                        RollbackTransaction();
+                        throw new Exception(message: $"Error ocurred while deleting item with id {item.Id}. Error: {error.Message}");
+                    }
+                }
+            }
+            CommitTransaction(false);
+            return succes;
+        }
+
     }
 }

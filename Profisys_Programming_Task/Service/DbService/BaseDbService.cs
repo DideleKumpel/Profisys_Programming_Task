@@ -63,6 +63,10 @@ namespace Profisys_Programming_Task.Service.DbService
             throw new NotImplementedException();
         }
 
+        public virtual int DeleteMany(List<T> items, bool CancelOnError)
+        {
+            throw new NotImplementedException();
+        }
         public virtual bool Exists(int id)
         {
             throw new NotImplementedException();
@@ -78,12 +82,12 @@ namespace Profisys_Programming_Task.Service.DbService
             throw new NotImplementedException();
         }
 
-        public virtual T Update(T item)
+        public virtual bool Update(T item)
         {
             throw new NotImplementedException();
         }
 
-        public virtual T Update(int id, T item)
+        public virtual bool Update(int id, T item)
         {
             throw new NotImplementedException();
         }
@@ -91,6 +95,6 @@ namespace Profisys_Programming_Task.Service.DbService
         public virtual int UpdateMany(List<T> items, bool CancelOnError)
         {
             throw new NotImplementedException();
-        }
+        }  
     }
 }
