@@ -19,6 +19,9 @@ namespace Profisys_Programming_Task.Service.DbService
             if (exception is ArgumentNullException)
             {
                 throw exception;
+            }else if (exception is DatabaseException)
+            {
+                throw exception;
             }
             else if(exception is DbUpdateException dbUpdateException)
             {

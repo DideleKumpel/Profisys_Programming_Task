@@ -4,23 +4,23 @@ using Profisys_Programming_Task.Service.Exceptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
-    internal class DocumentItemsDbService : BaseDbService<DocumentItems>
+    internal class DocumentsDbService : BaseDbService<Documents>
     {
-        public DocumentItemsDbService(AppDbContext appDbContext) : base(appDbContext)
+        public DocumentsDbService(AppDbContext appDbContext) : base(appDbContext)
         {
         }
 
         //Get
-        public override DocumentItems GetById(int id)
+        public override Documents GetById(int id)
         {
             try
             {
-                DocumentItems documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
-                if (documentItemsFound == null)
+                Documents documentsFound = _appDbContext.Documents.FirstOrDefault(x => x.Id == id);
+                if (documentsFound == null)
                 {
-                    throw new EntityNotFoundException("DocumentItems", id);
+                    throw new EntityNotFoundException("Documents", id);
                 }
-                return documentItemsFound;
+                return documentsFound;
             }
             catch (Exception error)
             {
@@ -29,11 +29,11 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override List<DocumentItems> GetAll()
+        public override List<Documents> GetAll()
         {
             try
             {
-                return _appDbContext.DocumentItems.ToList();
+                return _appDbContext.Documents.ToList();
             }
             catch (Exception error)
             {
@@ -46,7 +46,7 @@ namespace Profisys_Programming_Task.Service.DbService
         {
             try
             {
-                return _appDbContext.DocumentItems.Any(item => item.Id == id);
+                return _appDbContext.Documents.Any(x => x.Id == id);
             }
             catch (Exception error)
             {
@@ -56,23 +56,22 @@ namespace Profisys_Programming_Task.Service.DbService
         }
 
         //Insert
-        public override DocumentItems Add(DocumentItems item)
+        public override Documents Add(Documents item)
         {
             try
             {
-                DocumentItems addedItem = _appDbContext.DocumentItems.Add(item).Entity;
+                var addedDocument = _appDbContext.Documents.Add(item).Entity;
                 _appDbContext.SaveChanges();
-                return addedItem;
+                return addedDocument;
             }
             catch (Exception error)
             {
                 HandleException(error);
                 throw;
             }
-            
         }
 
-        public override int AddMany(List<DocumentItems> items, bool CancelOnError)
+        public override int AddMany(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
@@ -80,7 +79,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             BeginTransaction();
             int succes = 0;
-            foreach (DocumentItems item in items)
+            foreach (Documents item in items)
             {
                 try
                 {
@@ -97,12 +96,12 @@ namespace Profisys_Programming_Task.Service.DbService
                     }
                 }
             }
-            CommitTransaction(false);
+            CommitTransaction();
             return succes;
         }
 
         //Update
-        public override bool Update(DocumentItems item)
+        public override bool Update(Documents item)
         {
             if (item == null)
             {
@@ -112,9 +111,9 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 if (!Exists(item.Id))
                 {
-                    throw new EntityNotFoundException("DocumentItems", item.Id);
+                    throw new EntityNotFoundException("Documents", item.Id);
                 }
-                _appDbContext.DocumentItems.Update(item);
+                _appDbContext.Documents.Update(item);
                 _appDbContext.SaveChanges();
                 return true;
             }
@@ -125,7 +124,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override bool Update(int id, DocumentItems item)
+        public override bool Update(int id, Documents item)
         {
             if (item == null)
             {
@@ -135,7 +134,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 if (!Exists(id))
                 {
-                    throw new EntityNotFoundException("DocumentsItems", id);
+                    throw new EntityNotFoundException("Documents", id);
                 }
                 item.Id = id;
                 return Update(item);
@@ -147,15 +146,15 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override int UpdateMany(List<DocumentItems> items, bool CancelOnError)
+        public override int UpdateMany(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
-                throw new ArgumentException(nameof(items));
+                throw new ArgumentNullException(nameof(items));
             }
             BeginTransaction();
             int succes = 0;
-            foreach (DocumentItems item in items)
+            foreach (Documents item in items)
             {
                 try
                 {
@@ -172,13 +171,13 @@ namespace Profisys_Programming_Task.Service.DbService
                     }
                 }
             }
-            CommitTransaction(false);
+            CommitTransaction();
             return succes;
         }
 
         //Delete
-        public override bool Delete(DocumentItems item)
-        {
+        public override bool Delete(Documents item)
+        { 
             if (item == null)
             {
                 throw new ArgumentNullException(nameof(item));
@@ -187,9 +186,9 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 if (!Exists(item.Id))
                 {
-                    throw new EntityNotFoundException("DocumentsItems", item.Id);
+                    throw new EntityNotFoundException("Documents", item.Id);
                 }
-                _appDbContext.DocumentItems.Remove(item);
+                _appDbContext.Documents.Remove(item);
                 _appDbContext.SaveChanges();
                 return true;
             }
@@ -202,11 +201,11 @@ namespace Profisys_Programming_Task.Service.DbService
 
         public override bool Delete(int id)
         {
-            DocumentItems itemToDelete = GetById(id);
+            Documents itemToDelete = GetById(id);
             return Delete(itemToDelete);
         }
 
-        public override int DeleteMany(List<DocumentItems> items, bool CancelOnError)
+        public override int DeleteMany(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
@@ -214,7 +213,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             BeginTransaction();
             int succes = 0;
-            foreach (DocumentItems item in items)
+            foreach (Documents item in items)
             {
                 try
                 {
@@ -231,9 +230,8 @@ namespace Profisys_Programming_Task.Service.DbService
                     }
                 }
             }
-            CommitTransaction(false);
+            CommitTransaction();
             return succes;
         }
-
     }
 }
