@@ -18,72 +18,56 @@ namespace Profisys_Programming_Task.Service.DbService
             try
             {
                 documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
+                if (documentItemsFound == null)
+                {
+                    throw new Exception($"DocumentItems with id {id} not found.");
+                }
+                return documentItemsFound;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
             }
-            if (documentItemsFound == null)
-            {
-                throw new Exception($"DocumentItems with id {id} not found.");
-            }
-            return documentItemsFound;
         }
 
         public override List<DocumentItems> GetAll()
         {
-
-            List<DocumentItems> documentItemsList = null;
             try
             {
-                documentItemsList = _appDbContext.DocumentItems.ToList();
+                return _appDbContext.DocumentItems.ToList();
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error occurred while retrieving DocumentItems. Error: {ex.Message}");
             }
-            if (documentItemsList == null || documentItemsList.Count == 0)
-            {
-                throw new Exception($"Error occurred while retrieving DocumentItems.");
-            }
-            return documentItemsList;
         }
 
         public override bool Exists(int id)
         {
-            DocumentItems documentItemsFound = null;
             try
             {
-                documentItemsFound = _appDbContext.DocumentItems.Where(item => item.Id == id).FirstOrDefault();
+                return _appDbContext.DocumentItems.Any(item => item.Id == id);
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error occurred while retrieving DocumentItems with id {id}. Error: {ex.Message}");
-            }
-            if (documentItemsFound == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
             }
         }
 
         //Insert
         public override DocumentItems Add(DocumentItems item)
         {
-            DocumentItems addedItem = new DocumentItems();
             try
             {
-                addedItem = _appDbContext.DocumentItems.Add(item).Entity;
+                DocumentItems addedItem = _appDbContext.DocumentItems.Add(item).Entity;
                 _appDbContext.SaveChanges();
+                return addedItem;
             }
             catch (Exception error)
             {
                 throw new Exception(message: $"Error ocurred while adding item. Error: {error.Message}");
             }
-            return addedItem;
+            
         }
 
         public override int AddMany(List<DocumentItems> items, bool CancelOnError)
@@ -159,10 +143,6 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 try
                 {
-                    if (item == null)
-                    {
-                        throw new ArgumentNullException(nameof(item));
-                    }
                     Update(item);
                     succes++;
                 }
@@ -202,10 +182,6 @@ namespace Profisys_Programming_Task.Service.DbService
         public override bool Delete(int id)
         {
             DocumentItems itemToDelete = GetById(id);
-            if (itemToDelete == null)
-            {
-                throw new Exception($"DocumentItems with id {id} not found.");
-            }
             return Delete(itemToDelete);
         }
 
@@ -221,10 +197,6 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 try
                 {
-                    if (item == null)
-                    {
-                        throw new ArgumentNullException(nameof(item));
-                    }
                     Delete(item);
                     succes++;
                 }

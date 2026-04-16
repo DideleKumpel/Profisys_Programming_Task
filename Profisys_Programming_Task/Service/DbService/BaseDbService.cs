@@ -11,7 +11,7 @@ namespace Profisys_Programming_Task.Service.DbService
 {
     internal class BaseDbService<T> : IDbService<T>
     {
-        public readonly AppDbContext _appDbContext;
+        protected readonly AppDbContext _appDbContext;
         private IDbContextTransaction? _transaction;
         public BaseDbService(AppDbContext appDbContext)
         {
