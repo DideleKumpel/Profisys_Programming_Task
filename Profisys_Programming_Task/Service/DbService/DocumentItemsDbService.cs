@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Profisys_Programming_Task.Model;
-using System.Net;
-using System.Windows.Documents;
 
 namespace Profisys_Programming_Task.Service.DbService
 {

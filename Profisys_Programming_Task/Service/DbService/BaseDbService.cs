@@ -1,21 +1,60 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Profisys_Programming_Task.Service.Exeptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
-    internal class BaseDbService<T> : IDbService<T>
+    internal class BaseDbService<T> : IDbService<T> where T : class
     {
         protected readonly AppDbContext _appDbContext;
         private IDbContextTransaction? _transaction;
         public BaseDbService(AppDbContext appDbContext)
         {
             this._appDbContext = appDbContext;
+        }
+
+        protected void HandleException(Exception exception)
+        {
+            if (exception is ArgumentNullException)
+            {
+                throw exception;
+            }
+            else if(exception is DbUpdateException dbUpdateException)
+            {
+                if (exception.InnerException is SqlException sqlException)
+                {
+                    switch (sqlException.Number)
+                    {
+                        case 2627:
+                        case 2601:
+                            throw new UniqueConstraintException(sqlException);
+
+                        case 547:
+                            throw new ForeignKeyViolationException(sqlException);
+
+                        case 2:
+                        case 53:
+                        case 4060:
+                            throw new DatabaseConnectionException(sqlException);
+                    }
+                }
+                throw new DatabaseException("A database update error occurred.", dbUpdateException);
+            }
+            else if(exception is DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                throw new DatabaseException("The data was modified by another user. Please refresh.", dbUpdateConcurrencyException);
+            }
+            else if(exception is DatabaseException)
+            {
+                throw exception;
+            }
+            else
+            {
+                throw new DatabaseException("An unexpected database error occurred.", exception);
+            }
+
+            
         }
 
         public virtual void BeginTransaction()
