@@ -27,7 +27,7 @@ namespace Profisys_Programming_Task.Service.DbService
 
         //Transations
         void BeginTransaction();
-        void CommitTransaction();
+        void CommitTransaction(bool SaveChanges = true);
         void RollbackTransaction();
 
     }

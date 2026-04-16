@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -10,6 +12,7 @@ namespace Profisys_Programming_Task.Service.DbService
     internal class BaseDbService<T> : IDbService<T>
     {
         public readonly AppDbContext _appDbContext;
+        private IDbContextTransaction? _transaction;
         public BaseDbService(AppDbContext appDbContext)
         {
             this._appDbContext = appDbContext;
@@ -17,25 +20,28 @@ namespace Profisys_Programming_Task.Service.DbService
 
         public virtual void BeginTransaction()
         {
-            _appDbContext.Database.BeginTransaction();
+            _transaction = _appDbContext.Database.BeginTransaction();
         }
 
-        public virtual void CommitTransaction()
+        public virtual void CommitTransaction(bool SaveChanges = true)
         {
             try
             {
-                _appDbContext.SaveChanges();
-                _appDbContext.Database.CommitTransaction();
+                if (SaveChanges)
+                {
+                    _appDbContext.SaveChanges();
+                }
+                _transaction?.Commit();
             }
-            catch (Exception e)
+            catch
             {
-                RollbackTransaction();
-                throw e;
+                _transaction?.Rollback();
+                throw;
             }
         }
         public virtual void RollbackTransaction()
         {
-            _appDbContext.Database.RollbackTransaction();
+            _transaction?.Rollback();
         }
         public virtual T Add(T item)
         {
