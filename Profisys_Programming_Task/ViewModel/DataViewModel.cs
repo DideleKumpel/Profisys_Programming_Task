@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Profisys_Programming_Task.Model;
 using Profisys_Programming_Task.Service.DbService;
@@ -8,15 +7,8 @@ using Profisys_Programming_Task.Service.Exceptions;
 using Profisys_Programming_Task.View.Dialog;
 using Profisys_Programming_Task.ViewModel.DialogViewModel;
 using Profisys_Programming_Task.ViewModel.Filters;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace Profisys_Programming_Task.ViewModel
 {
@@ -34,6 +26,12 @@ namespace Profisys_Programming_Task.ViewModel
         [ObservableProperty]
         private Documents? _selectedDocument;
 
+        partial void OnSelectedDocumentChanged(Documents? value)
+        {
+            DeleteDocumentCommand.NotifyCanExecuteChanged();
+            ShowDocumentDetailsCommand.NotifyCanExecuteChanged();
+        }
+
         //FILTERS
         private IQueryable<Documents> _filtersQuery;
         [ObservableProperty]
@@ -46,11 +44,11 @@ namespace Profisys_Programming_Task.ViewModel
             _documentItemsDbService = itemService;
         }
 
-        private void FetchDocuments()
+        private async Task FetchDocumentsAsync()
         {
             try
             {
-                List<Documents> documentsList = _documentDbService.GetAll();
+                List<Documents> documentsList = await _documentDbService.GetAllAsync();
                 _documents = new ObservableCollection<Documents>(documentsList);
             }
             catch (Exception error)
@@ -81,10 +79,10 @@ namespace Profisys_Programming_Task.ViewModel
         }   
 
         [RelayCommand]
-        private void RefreshData()
+        private async Task RefreshDataAsync()
         {
-            FetchDocuments();
-            if (DocumentDisplayFilters.FiltersAreSet() && _filtersQuery != null)
+            await FetchDocumentsAsync();
+            if (DocumentDisplayFilters.FiltersAreSet())
             {
                 LoadFiltredDocuments();
             }
@@ -101,8 +99,8 @@ namespace Profisys_Programming_Task.ViewModel
             Application.Current.MainWindow.DataContext = mainMenuViewModel;
         }
 
-        [RelayCommand]
-        private void DeleteDocument()
+        [RelayCommand(CanExecute = nameof(DocumentIsSelected))]
+        private async Task DeleteDocumentAsync()
         {
             if (SelectedDocument != null)
             {
@@ -118,12 +116,12 @@ namespace Profisys_Programming_Task.ViewModel
                 {
                     try
                     {
-                        _documentDbService.Delete(SelectedDocument);
+                        await _documentDbService.DeleteAsync(SelectedDocument);
                     }
                     catch(EntityNotFoundException error)
                     {
                         MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        RefreshData();
+                        await RefreshDataAsync();
                         return;
                     }
                     catch (DatabaseConnectionException error)
@@ -138,7 +136,7 @@ namespace Profisys_Programming_Task.ViewModel
                         return;
                     }
                     MessageBox.Show("Document deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshData();
+                    await RefreshDataAsync();
                 }
                 else
                 {
@@ -151,8 +149,8 @@ namespace Profisys_Programming_Task.ViewModel
             }
         }
 
-        [RelayCommand]
-        private void ShowDocumentDetails()
+        [RelayCommand(CanExecute = nameof(DocumentIsSelected))]
+        private async Task ShowDocumentDetailsAsync()
         {
             if (_selectedDocument != null)
             {
@@ -160,7 +158,7 @@ namespace Profisys_Programming_Task.ViewModel
                 var detailsDialogViewModel = new DocumentsItemDialogViewModel(new AppDbContext(), _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
-                detailsDialogViewModel.LoadItemsAsync();
+                await detailsDialogViewModel.LoadItemsAsync();
                 detailsDialog.ShowDialog();
             }
             else
@@ -169,14 +167,14 @@ namespace Profisys_Programming_Task.ViewModel
             }
         }
 
-        private bool CanShowDocumentDetails()
+        private bool DocumentIsSelected()
         {
-            return _selectedDocument != null;
+            return SelectedDocument != null;
         }
 
-        //FILTERS FUNCTION 
+        //FILTERS  
         [RelayCommand]
-        private void ApplyFilters()
+        private async Task ApplyFiltersAsync()
         {
             IQueryable<Documents> query = _documents.AsQueryable();
             if (DocumentDisplayFilters.StartDateFilter <= DocumentDisplayFilters.EndDateFilter)
@@ -218,11 +216,11 @@ namespace Profisys_Programming_Task.ViewModel
             }
             
             _filtersQuery = query;
-            RefreshData();
+            await RefreshDataAsync();
         }
 
         [RelayCommand]
-        private void ClearFilters()
+        private async Task ClearFiltersAsync()
         {
             DocumentDisplayFilters.SelectedDocumentType = DocumentTypeFilters.All;
             DocumentDisplayFilters.FirstNameFilter = string.Empty;
@@ -230,8 +228,7 @@ namespace Profisys_Programming_Task.ViewModel
             DocumentDisplayFilters.CityFilter = string.Empty;
             DocumentDisplayFilters.StartDateFilter = DateTime.MinValue;
             DocumentDisplayFilters.EndDateFilter = DateTime.Today;
-            _filtersQuery = null;
-            RefreshData();
+            await RefreshDataAsync();
         }
     }
 }

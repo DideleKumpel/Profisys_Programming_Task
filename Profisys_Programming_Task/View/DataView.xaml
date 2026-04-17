@@ -56,7 +56,7 @@
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel  Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,3">
-                                <Button Width="60" Height="30" HorizontalAlignment="Right" Margin="10,0" Command="{Binding ApplayFiltersCommand}">Save</Button>
+                                <Button Width="60" Height="30" HorizontalAlignment="Right" Margin="10,0" Command="{Binding ApplyFiltersCommand}">Save</Button>
                                 <Button Width="60" Height="30" HorizontalAlignment="Right" Margin="10,0" Command="{Binding ClearFiltersCommand}">Reset</Button>
                             </StackPanel>
                         </Grid>
