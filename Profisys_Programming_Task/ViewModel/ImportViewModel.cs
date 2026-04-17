@@ -11,59 +11,56 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CsvHelper.Configuration;
 using CsvHelper;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Reflection.Metadata;
 using Profisys_Programming_Task.Model;
-using System.Diagnostics;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Profisys_Programming_Task.Service.DbService;
+using Profisys_Programming_Task.Service.Import;
 
 namespace Profisys_Programming_Task.ViewModel
 {
-    internal class ImportViewModel : ObservableObject
+    internal partial class ImportViewModel : ObservableObject
     {
         //SERVICE
-        private readonly AppDbContext _appDbContext;
+        private readonly IImportService<Documents> _documentsImportService;
+        private readonly IImportService<DocumentItems> _documentItemsImportService;
+        private readonly IDbService<Documents> _documentsDbService;
+        private readonly IDbService<DocumentItems> _documentItemsDbService;
 
         //DATA FOR IMPORT
-        public string FilePath { get; set; }
-        public bool IsImporting { get; set; }
-        public double ImportProgress { get; set; }
+        [ObservableProperty]
+        private string _filePath;
+        [ObservableProperty]
+        private bool _isImporting;
+        [ObservableProperty]
+        private double _importProgress;
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationTokenSource _abortImportToken;
 
         //DATAGRID
-        public string DocumetnsDataGridVisibility { get; set; }
-        public string DocumentItemsDataGridVisibility { get; set; }
-        public ObservableCollection<Documents> ImportedDocuments { get; set; }
-        public ObservableCollection<DocumentItems> ImportedDocumentItems { get; set; } 
-
-        //COMMAND
-        public RelayCommand BackToMenuCommand { get; }
-        public RelayCommand ChooseFileCommand { get; }
-        public AsyncRelayCommand ImportDataCommand { get; }
-        public RelayCommand CancelImportCommand { get; }
-        public RelayCommand AbortImportCommand { get; }
+        [ObservableProperty]
+        private Visibility _documetnsDataGridVisibility;
+        [ObservableProperty]
+        private Visibility _documentItemsDataGridVisibility;
+        [ObservableProperty]
+        private ObservableCollection<Documents> _importedDocuments;
+        [ObservableProperty]
+        private ObservableCollection<DocumentItems> _importedDocumentItems;
 
         //CONSTRUCTOR
-        public ImportViewModel(AppDbContext appDbContext)
+        public ImportViewModel(IDbService<Documents> documentsDbService, IDbService<DocumentItems> documentItemsDbService, IImportService<Documents> documentsImportService, IImportService<DocumentItems> documentItemsImportService)
         {
-            _appDbContext = appDbContext;
+            _documentsDbService = documentsDbService;
+            _documentItemsDbService = documentItemsDbService;
+            _documentsImportService = documentsImportService;
+            _documentItemsImportService = documentItemsImportService;
 
             IsImporting = false;
             //DataGrid info
             DocumetnsDataGridVisibility = "Visible";
             DocumentItemsDataGridVisibility = "Collapsed";
-
-            //COMMENDS
-            BackToMenuCommand = new RelayCommand(BackToMenu, IsNotImporting);
-            ChooseFileCommand = new RelayCommand(ChooseFile, IsNotImporting);
-            ImportDataCommand = new AsyncRelayCommand(ProccesCsvAsycn, CanImport);
-            CancelImportCommand = new RelayCommand(CancelImport, CanCancelImporting);
-            AbortImportCommand = new RelayCommand(AbortImport, CanCancelImporting);
         }
         
 

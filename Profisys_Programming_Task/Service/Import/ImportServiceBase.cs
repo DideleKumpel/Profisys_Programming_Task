@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Profisys_Programming_Task.Service.Import
 {
-    internal class ImportServiceBase<T>: ImportService<T> where T : class
+    internal class ImportServiceBase<T>: IImportService<T> where T : class
     {
         protected CsvConfiguration _csvConfiguration;
 

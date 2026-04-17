@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Profisys_Programming_Task.Model;
 using Profisys_Programming_Task.Service.DbService;
+using Profisys_Programming_Task.Service.Import;
 using Profisys_Programming_Task.ViewModel;
 using Profisys_Programming_Task.ViewModel.DialogViewModel;
 using System.Configuration;
@@ -27,6 +28,8 @@ namespace Profisys_Programming_Task
 
             services.AddScoped<IDbService<Documents>, DocumentsDbService>();
             services.AddScoped<IDocumentItemsDbService, DocumentItemsDbService>();
+            services.AddScoped<IImportService<Documents>, DocuemntsImportService>();
+            services.AddScoped<IImportService<DocumentItems>, DocumentItemsImportService>();
 
             services.AddTransient<MainMenuViewModel>();
             services.AddTransient<DataViewModel>();
