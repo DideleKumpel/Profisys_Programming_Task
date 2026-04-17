@@ -1,14 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Profisys_Programming_Task.Model;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Profisys_Programming_Task.Service.Import
 {
@@ -18,7 +11,7 @@ namespace Profisys_Programming_Task.Service.Import
 
         public DocuemntsImportService(CsvConfiguration csvConfiguration): base(csvConfiguration) {}
 
-        public override async Task<List<Documents>> ImportDocumentsFromCsvAsync(string filePath)
+        public override async Task<List<Documents>> ImportFromCsvAsync(string filePath)
         {
             ValidateCsvFilePath(filePath);
 

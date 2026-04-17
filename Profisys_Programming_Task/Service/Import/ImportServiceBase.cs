@@ -1,11 +1,5 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
+﻿using CsvHelper.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Profisys_Programming_Task.Service.Import
 {
@@ -48,7 +42,7 @@ namespace Profisys_Programming_Task.Service.Import
                 throw new InvalidDataException("Invalid file format. Only CSV files are supported.");
             }
         }
-        public virtual async Task<List<T>> ImportDocumentsFromCsvAsync(string filePath)
+        public virtual async Task<List<T>> ImportFromCsvAsync(string filePath)
         {
             throw new NotImplementedException();
         }
