@@ -176,26 +176,9 @@ namespace Profisys_Programming_Task.ViewModel
 
         //FILTERS FUNCTION 
         [RelayCommand]
-        private void ApplayFilters()
+        private void ApplyFilters()
         {
             IQueryable<Documents> query = _documents.AsQueryable();
-            if (DocumentDisplayFilters.SelectedDocumentType != DocumentTypeFilters.All)
-            {
-                DocumentType documentType = (DocumentType)DocumentDisplayFilters.SelectedDocumentType;
-                query = query.Where(d => d.Type == documentType);
-            }
-            if (!string.IsNullOrEmpty(DocumentDisplayFilters.FirstNameFilter))
-            {
-                query = query.Where(d => d.FirstName.Contains(DocumentDisplayFilters.FirstNameFilter));
-            }
-            if (!string.IsNullOrEmpty(DocumentDisplayFilters.LastNameFilter))
-            {
-                query = query.Where(d => d.LastName.Contains(DocumentDisplayFilters.LastNameFilter));
-            }
-            if (!string.IsNullOrEmpty(DocumentDisplayFilters.CityFilter))
-            {
-                query = query.Where(d => d.City.Contains(DocumentDisplayFilters.CityFilter));
-            }
             if (DocumentDisplayFilters.StartDateFilter <= DocumentDisplayFilters.EndDateFilter)
             {
                 if (DocumentDisplayFilters.StartDateFilter != DateTime.MinValue)
@@ -212,6 +195,28 @@ namespace Profisys_Programming_Task.ViewModel
                 MessageBox.Show("Time interval not set correctly");
                 return;
             }
+
+            if (DocumentDisplayFilters.SelectedDocumentType != DocumentTypeFilters.All)
+            {
+                DocumentType documentType = (DocumentType)DocumentDisplayFilters.SelectedDocumentType;
+                query = query.Where(d => d.Type == documentType);
+            }
+
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.FirstNameFilter))
+            {
+                query = query.Where(d => d.FirstName.ToLower().Contains(DocumentDisplayFilters.FirstNameFilter.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.LastNameFilter))
+            {
+                query = query.Where(d => d.LastName.ToLower().Contains(DocumentDisplayFilters.LastNameFilter.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.CityFilter))
+            {
+                query = query.Where(d => d.City.ToLower().Contains(DocumentDisplayFilters.CityFilter.ToLower()));
+            }
+            
             _filtersQuery = query;
             RefreshData();
         }
@@ -220,9 +225,9 @@ namespace Profisys_Programming_Task.ViewModel
         private void ClearFilters()
         {
             DocumentDisplayFilters.SelectedDocumentType = DocumentTypeFilters.All;
-            DocumentDisplayFilters.FirstNameFilter = "";
-            DocumentDisplayFilters.LastNameFilter = "";
-            DocumentDisplayFilters.CityFilter = "";
+            DocumentDisplayFilters.FirstNameFilter = string.Empty;
+            DocumentDisplayFilters.LastNameFilter = string.Empty;
+            DocumentDisplayFilters.CityFilter = string.Empty;
             DocumentDisplayFilters.StartDateFilter = DateTime.MinValue;
             DocumentDisplayFilters.EndDateFilter = DateTime.Today;
             _filtersQuery = null;

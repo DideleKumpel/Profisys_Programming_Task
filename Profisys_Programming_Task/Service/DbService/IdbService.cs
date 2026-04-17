@@ -2,28 +2,25 @@
 {
     internal interface IDbService<T>
     {
-        public T GetById(int id);
-        public List<T> GetAll();
-        bool Exists(int id);
+        public Task<T> GetByIdAsync(int id);
+        public Task<List<T>> GetAllAsync();
+        Task<bool> ExistsAsync(int id);
 
         //Create
-        T Add(T item);
-        int AddMany(List<T> items, bool CancelOnError);
-
+        Task<T> AddAsync(T item);
+        Task<int> AddManyAsync(List<T> items, bool CancelOnError);
         //Update
-        bool Update(T item);
-        bool Update(int id, T item);
-        int UpdateMany(List<T> items, bool CancelOnError);
-
+        Task<bool> UpdateAsync(T item);
+        Task<bool> UpdateAsync(int id, T item);
+        Task<int> UpdateManyAsync(List<T> items, bool CancelOnError);
         //Delete
-        bool Delete(int id);
-        bool Delete(T item);
-        int DeleteMany(List<T> items, bool CancelOnError);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(T item);
+        Task<int> DeleteManyAsync(List<T> items, bool CancelOnError);
 
         //Transations
         void BeginTransaction();
         void CommitTransaction(bool SaveChanges = true);
         void RollbackTransaction();
-
     }
 }

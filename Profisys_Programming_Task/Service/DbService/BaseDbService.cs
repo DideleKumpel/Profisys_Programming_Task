@@ -84,56 +84,56 @@ namespace Profisys_Programming_Task.Service.DbService
         {
             _transaction?.Rollback();
         }
-        public virtual T Add(T item)
+        public virtual Task<T> AddAsync(T item)
         {
             throw new NotImplementedException();
         }
 
-        public virtual int AddMany(List<T> items, bool CancelOnError)
+        public virtual Task<int> AddManyAsync(List<T> items, bool CancelOnError)
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool Delete(int id)
+        public virtual Task<bool> DeleteAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool Delete(T item)
+        public virtual Task<bool> DeleteAsync(T item)
         {
             throw new NotImplementedException();
         }
 
-        public virtual int DeleteMany(List<T> items, bool CancelOnError)
+        public virtual Task<int> DeleteManyAsync(List<T> items, bool CancelOnError)
         {
             throw new NotImplementedException();
         }
-        public virtual bool Exists(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual List<T> GetAll()
+        public virtual Task<bool> ExistsAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public virtual T GetById(int id)
+        public virtual Task<List<T>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool Update(T item)
+        public virtual Task<T> GetByIdAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool Update(int id, T item)
+        public virtual Task<bool> UpdateAsync(T item)
         {
             throw new NotImplementedException();
         }
 
-        public virtual int UpdateMany(List<T> items, bool CancelOnError)
+        public virtual Task<bool> UpdateAsync(int id, T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<int> UpdateManyAsync(List<T> items, bool CancelOnError)
         {
             throw new NotImplementedException();
         }  

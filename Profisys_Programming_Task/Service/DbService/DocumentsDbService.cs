@@ -11,11 +11,11 @@ namespace Profisys_Programming_Task.Service.DbService
         }
 
         //Get
-        public override Documents GetById(int id)
+        public override async Task<Documents> GetByIdAsync(int id)
         {
             try
             {
-                Documents documentsFound = _appDbContext.Documents.FirstOrDefault(x => x.Id == id);
+                Documents documentsFound = await _appDbContext.Documents.FirstOrDefaultAsync(x => x.Id == id);
                 if (documentsFound == null)
                 {
                     throw new EntityNotFoundException("Documents", id);
@@ -29,11 +29,11 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override List<Documents> GetAll()
+        public override async Task<List<Documents>> GetAllAsync()
         {
             try
             {
-                return _appDbContext.Documents.ToList();
+                return await _appDbContext.Documents.ToListAsync();
             }
             catch (Exception error)
             {
@@ -42,11 +42,11 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override bool Exists(int id)
+        public override async Task<bool> ExistsAsync(int id)
         {
             try
             {
-                return _appDbContext.Documents.Any(x => x.Id == id);
+                return await _appDbContext.Documents.AnyAsync(x => x.Id == id);
             }
             catch (Exception error)
             {
@@ -56,12 +56,12 @@ namespace Profisys_Programming_Task.Service.DbService
         }
 
         //Insert
-        public override Documents Add(Documents item)
+        public override async Task<Documents> AddAsync(Documents item)
         {
             try
             {
                 var addedDocument = _appDbContext.Documents.Add(item).Entity;
-                _appDbContext.SaveChanges();
+                await _appDbContext.SaveChangesAsync();
                 return addedDocument;
             }
             catch (Exception error)
@@ -71,7 +71,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override int AddMany(List<Documents> items, bool CancelOnError)
+        public override async Task<int> AddManyAsync(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
@@ -83,7 +83,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 try
                 {
-                    Add(item);
+                    await AddAsync(item);
                     succes++;
                 }
                 catch (Exception error)
@@ -101,7 +101,7 @@ namespace Profisys_Programming_Task.Service.DbService
         }
 
         //Update
-        public override bool Update(Documents item)
+        public override async Task<bool> UpdateAsync(Documents item)
         {
             if (item == null)
             {
@@ -109,12 +109,12 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             try
             {
-                if (!Exists(item.Id))
+                if (!await ExistsAsync(item.Id))
                 {
                     throw new EntityNotFoundException("Documents", item.Id);
                 }
                 _appDbContext.Documents.Update(item);
-                _appDbContext.SaveChanges();
+                await _appDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception error)
@@ -124,7 +124,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override bool Update(int id, Documents item)
+        public override async Task<bool> UpdateAsync(int id, Documents item)
         {
             if (item == null)
             {
@@ -132,12 +132,12 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             try
             {
-                if (!Exists(id))
+                if (!await ExistsAsync(id))
                 {
                     throw new EntityNotFoundException("Documents", id);
                 }
                 item.Id = id;
-                return Update(item);
+                return await UpdateAsync(item);
             }
             catch (Exception error)
             {
@@ -146,7 +146,7 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override int UpdateMany(List<Documents> items, bool CancelOnError)
+        public override async Task<int> UpdateManyAsync(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
@@ -158,7 +158,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 try
                 {
-                    Update(item);
+                    await UpdateAsync(item);
                     succes++;
                 }
                 catch (Exception error)
@@ -176,7 +176,7 @@ namespace Profisys_Programming_Task.Service.DbService
         }
 
         //Delete
-        public override bool Delete(Documents item)
+        public override async Task<bool> DeleteAsync(Documents item)
         { 
             if (item == null)
             {
@@ -184,12 +184,12 @@ namespace Profisys_Programming_Task.Service.DbService
             }
             try
             {
-                if (!Exists(item.Id))
+                if (!await ExistsAsync(item.Id))
                 {
                     throw new EntityNotFoundException("Documents", item.Id);
                 }
                 _appDbContext.Documents.Remove(item);
-                _appDbContext.SaveChanges();
+                await _appDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception error)
@@ -199,13 +199,13 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public override bool Delete(int id)
+        public override async Task<bool> DeleteAsync(int id)
         {
-            Documents itemToDelete = GetById(id);
-            return Delete(itemToDelete);
+            Documents itemToDelete = await GetByIdAsync(id);
+            return await DeleteAsync(itemToDelete);
         }
 
-        public override int DeleteMany(List<Documents> items, bool CancelOnError)
+        public override async Task<int> DeleteManyAsync(List<Documents> items, bool CancelOnError)
         {
             if (items == null)
             {
@@ -217,7 +217,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 try
                 {
-                    Delete(item);
+                    await DeleteAsync(item);
                     succes++;
                 }
                 catch (Exception error)
