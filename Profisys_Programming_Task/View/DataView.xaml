@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Profisys_Programming_Task.View"
+             xmlns:local="clr-namespace:Profisys_Programming_Task.View" xmlns:viewmodel="clr-namespace:Profisys_Programming_Task.ViewModel" 
+             d:DataContext="{d:DesignInstance Type=viewmodel:DataViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1200">
 
@@ -13,7 +14,7 @@
             <RowDefinition Height="10*"></RowDefinition>
             <RowDefinition Height="70*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding BackToMenuCommand}">Back to menu</Button>
+        <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding SwitchToMainMenuCommand}">Back to menu</Button>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Height="75" Width="150" Margin="10" Command="{Binding DeleteDocumentCommand}">Delete document</Button>
             <Button Height="75" Width="150" Margin="10"  Command="{Binding ShowDocumentDetailsCommand}">
@@ -38,20 +39,20 @@
                             <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2"></Rectangle>
                             <StackPanel Margin="10" Grid.RowSpan="2">
                                 <TextBlock FontSize="12">Type:</TextBlock>
-                                <ComboBox ItemsSource="{Binding _documentTypes}" SelectedItem="{Binding SelectedDocumentType, Mode=TwoWay}"/>
+                                <ComboBox ItemsSource="{Binding DocumentDisplayFilters.DocumentTypes}" SelectedItem="{Binding DocumentDisplayFilters.SelectedDocumentType, Mode=TwoWay}"/>
                                 <TextBlock FontSize="12">First name:</TextBlock>
-                                <TextBox Text="{Binding FirstNameFilter,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding DocumentDisplayFilters.FirstNameFilter,UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBlock FontSize="12">Last name:</TextBlock>
-                                <TextBox Text="{Binding LastNameFilter,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding DocumentDisplayFilters.LastNameFilter,UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                             <StackPanel Margin="10" Grid.Column="1">
                                 <TextBlock FontSize="12">City:</TextBlock>
-                                <TextBox Text="{Binding CityFilter,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding DocumentDisplayFilters.CityFilter,UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBlock FontSize="12">Date:</TextBlock>
                                 <StackPanel Orientation="Horizontal">
-                                    <DatePicker Width="150" Text="{Binding StartDateFilter, Mode=TwoWay}"/>
+                                    <DatePicker Width="150" SelectedDate="{Binding DocumentDisplayFilters.StartDateFilter, Mode=TwoWay}"/>
                                     <TextBlock >-</TextBlock>
-                                    <DatePicker Width="150" Text="{Binding EndDateFilter, Mode=TwoWay}"/>
+                                    <DatePicker Width="150" SelectedDate="{Binding DocumentDisplayFilters.EndDateFilter, Mode=TwoWay}"/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel  Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,3">
@@ -65,8 +66,9 @@
             <Button Height="30" Margin="30,0,0,0" Command="{Binding RefreshDataCommand}">Resfresh data</Button>
         </StackPanel>
         <DataGrid Grid.Row="2" Margin="15"
-              ItemsSource="{Binding _Documents}"
+              ItemsSource="{Binding DocumentsDisplay}"
               SelectedItem="{Binding SelectedDocument}"
+              SelectionMode="Single"
               SelectionUnit="FullRow"
               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
               AutoGenerateColumns="False">

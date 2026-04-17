@@ -1,4 +1,10 @@
-﻿using System.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Profisys_Programming_Task.Model;
+using Profisys_Programming_Task.Service.DbService;
+using Profisys_Programming_Task.ViewModel;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +15,26 @@ namespace Profisys_Programming_Task
     /// </summary>
     public partial class App : Application
     {
+        public IServiceProvider ServiceProvider { get; private set; }
+        public App()
+        {
+            ServiceCollection services = new ServiceCollection();
+
+            services.AddDbContext<AppDbContext>(options => 
+            {
+                string connection = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                options.UseSqlServer(connection);
+            });
+
+            services.AddScoped<IDbService<Documents>, DocumentsDbService>();
+            services.AddScoped<IDbService<DocumentItems>, DocumentItemsDbService>();
+
+            services.AddTransient<MainMenuViewModel>();
+            services.AddTransient<DataViewModel>();
+            services.AddTransient<ImportViewModel>();
+
+            ServiceProvider = services.BuildServiceProvider();
+        }
     }
 
 }

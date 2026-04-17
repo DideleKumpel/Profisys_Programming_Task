@@ -37,6 +37,7 @@ namespace Profisys_Programming_Task.Service.DbService
                             throw new ForeignKeyViolationException(sqlException);
 
                         case 2:
+                        case 40:
                         case 53:
                         case 4060:
                             throw new DatabaseConnectionException(sqlException);
@@ -56,8 +57,6 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 throw new DatabaseException("An unexpected database error occurred.", exception);
             }
-
-            
         }
 
         public virtual void BeginTransaction()

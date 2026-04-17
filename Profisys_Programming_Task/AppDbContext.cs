@@ -11,13 +11,24 @@ namespace Profisys_Programming_Task
 {
     class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
+        public AppDbContext()
+        {
+        }
+
         public DbSet<Documents> Documents { get; set; }
         public DbSet<DocumentItems> DocumentItems { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connection = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            optionsBuilder.UseSqlServer(connection);
+            if (!optionsBuilder.IsConfigured)
+            {
+                string connection = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                optionsBuilder.UseSqlServer(connection);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,7 +41,7 @@ namespace Profisys_Programming_Task
                 .HasOne<Documents>()
                 .WithMany()
                 .HasForeignKey(d => d.DocumentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

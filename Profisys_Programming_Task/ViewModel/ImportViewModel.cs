@@ -305,7 +305,7 @@ namespace Profisys_Programming_Task.ViewModel
         }
         private void BackToMenu()
         {
-            Application.Current.MainWindow.DataContext = new MainMenuViewModel(_appDbContext);
+            Application.Current.MainWindow.DataContext = new MainMenuViewModel();
         }
 
         private void CancelImport()

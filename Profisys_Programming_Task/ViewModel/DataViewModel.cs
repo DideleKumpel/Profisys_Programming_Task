@@ -1,4 +1,14 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Profisys_Programming_Task.Model;
+using Profisys_Programming_Task.Service.DbService;
+using Profisys_Programming_Task.Service.Exceptions;
+using Profisys_Programming_Task.View.Dialog;
+using Profisys_Programming_Task.ViewModel.DialogViewModel;
+using Profisys_Programming_Task.ViewModel.Filters;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,168 +17,56 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
-using Profisys_Programming_Task.Model;
-using Profisys_Programming_Task.View.Dialog;
-using Profisys_Programming_Task.ViewModel.DialogViewModel;
 
 namespace Profisys_Programming_Task.ViewModel
 {
     internal partial class DataViewModel : ObservableObject
     {
         //SERVICES
-        private readonly AppDbContext _appDbContext;
+        private readonly IDbService<DocumentItems> _documentItemsDbService;
+        private readonly IDbService<Documents> _documentDbService;
+        private ObservableCollection<Documents> _documents;
 
         //DATAGRID
-        public ObservableCollection<Documents> _Documents { get; set; }
+        [ObservableProperty]
+        private ObservableCollection<Documents> _documentsDisplay;
 
+        [ObservableProperty]
         private Documents? _selectedDocument;
-        public Documents? SelectedDocument
-        {
-            get { return _selectedDocument; }
-            set
-            {
-                if (_selectedDocument != value)
-                {
-                    _selectedDocument = value;
-                    ShowDocumentDetailsCommand.NotifyCanExecuteChanged();
-                    DeleteDocumentCommand.NotifyCanExecuteChanged();
-                }
-            }
-        }
+
         //FILTERS
-        private bool FiltersAreSet = false;
-        private IQueryable<Documents> FiltersQuery;
-        public ObservableCollection<DocumentTypeFilters> _documentTypes { get; set; }
-        private DocumentTypeFilters _selectedDocumentType;
-        public DocumentTypeFilters SelectedDocumentType
-        {
-            get => _selectedDocumentType;
-            set
-            {
-                if (_selectedDocumentType != value)
-                {
-                    _selectedDocumentType = value;
-                    OnPropertyChanged(nameof(SelectedDocumentType));
-                }
-            }
-        }
-
-        private string _firstNameFilter;
-        public string FirstNameFilter
-        {
-            get => _firstNameFilter;
-            set
-            {
-                if (_firstNameFilter != value)
-                {
-                    _firstNameFilter = value;
-                    OnPropertyChanged(nameof(FirstNameFilter));
-                }
-            }
-        }
-        private string _lastNameFilter;
-        public string LastNameFilter
-        {
-            get => _lastNameFilter;
-            set
-            {
-                if (_lastNameFilter != value)
-                {
-                    _lastNameFilter = value;
-                    OnPropertyChanged(nameof(LastNameFilter));
-                }
-            }
-        }
-        private string _cityFilter;
-        public string CityFilter
-        {
-            get => _cityFilter;
-            set
-            {
-                if (_cityFilter != value)
-                {
-                    _cityFilter = value;
-                    OnPropertyChanged(nameof(CityFilter));
-                }
-            }
-        }
-        private DateTime _startDateFilter;
-        public DateTime StartDateFilter
-        {
-            get => _startDateFilter;
-            set
-            {
-                if (value <= DateTime.Today) // Blokowanie przyszłych dat
-                {
-                    SetProperty(ref _startDateFilter, value);
-                }
-            }
-        }
-        private DateTime _endDateFilter;
-        public DateTime EndDateFilter
-        {
-            get => _endDateFilter;
-            set
-            {
-                if (value <= DateTime.Today) // Blokowanie przyszłych dat
-                {
-                    SetProperty(ref _endDateFilter, value);
-                }
-            }
-        }
-
-
-        //COMMANDS
-        public RelayCommand BackToMenuCommand { get; }
-        public RelayCommand ShowDocumentDetailsCommand { get; }
-        public AsyncRelayCommand ApplayFiltersCommand { get; }
-        public AsyncRelayCommand ClearFiltersCommand { get; }
-        public AsyncRelayCommand RefreshDataCommand { get; }
-        public AsyncRelayCommand DeleteDocumentCommand { get; }
+        private IQueryable<Documents> _filtersQuery;
+        [ObservableProperty]
+        private DocumentFilters _documentDisplayFilters = new DocumentFilters();
 
         //CONSTRUCTOR
-        public DataViewModel(AppDbContext appDbContext)
+        public DataViewModel(IDbService<Documents> docService, IDbService<DocumentItems> itemService)
         {
-            _appDbContext = appDbContext;
-            _Documents = new ObservableCollection<Documents>();
-
-            //COMANDS
-            BackToMenuCommand = new RelayCommand(SwitchToMainMenu);
-            ShowDocumentDetailsCommand = new RelayCommand(ShowDocumentDetails, CanShowDocumentDetails);
-            ApplayFiltersCommand = new AsyncRelayCommand(ApplayFiltersAsync);
-            ClearFiltersCommand = new AsyncRelayCommand(ClearFiltersAsync);
-            RefreshDataCommand = new AsyncRelayCommand(RefreshDataAsync);
-            DeleteDocumentCommand = new AsyncRelayCommand(DeleteDocumentAsync, CanShowDocumentDetails);
-
-            //Transfer data from enum DocumentType to collection binded to Taks type filter combobox
-            _documentTypes = new ObservableCollection<DocumentTypeFilters>(Enum.GetValues(typeof(DocumentTypeFilters)).Cast<DocumentTypeFilters>());
-            EndDateFilter = DateTime.Today;
-            SelectedDocumentType = DocumentTypeFilters.All;
+            _documentDbService = docService;
+            _documentItemsDbService = itemService;
         }
 
-        public async Task LoadDocumentsAsync()
+        private void FetchDocuments()
         {
             try
             {
-                _Documents = new ObservableCollection<Documents>(await _appDbContext.Documents.ToListAsync());
-                OnPropertyChanged(nameof(_Documents));
+                List<Documents> documentsList = _documentDbService.GetAll();
+                _documents = new ObservableCollection<Documents>(documentsList);
             }
-            catch (Exception ex) {
-                MessageBox.Show("Could not connect to the database. Please check your connection and try again.");
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                SwitchToMainMenu();
             }
         }
 
-        public async Task LoadFiltredDocumentsAsync( )
+        private void LoadFiltredDocuments()
         {
             try
             {
-                if (FiltersQuery != null)
+                if (_filtersQuery != null)
                 {
-                    _Documents = new ObservableCollection<Documents>(await FiltersQuery.ToListAsync());
-                    OnPropertyChanged(nameof(_Documents));
+                    DocumentsDisplay = new ObservableCollection<Documents>(_filtersQuery.ToList());
                 }
             }
             catch (Exception ex)
@@ -177,129 +75,158 @@ namespace Profisys_Programming_Task.ViewModel
             }
         }
 
-        
+        private void LoadDocuments()
+        {
+            DocumentsDisplay = _documents;
+        }   
 
-        public async Task RefreshDataAsync() {
-            if (FiltersAreSet && FiltersQuery != null)
+        [RelayCommand]
+        private void RefreshData()
+        {
+            FetchDocuments();
+            if (DocumentDisplayFilters.FiltersAreSet() && _filtersQuery != null)
             {
-                LoadFiltredDocumentsAsync();
+                LoadFiltredDocuments();
             }
             else
             {
-                LoadDocumentsAsync();
+                LoadDocuments();
             }
         }
 
-        public void SwitchToMainMenu()
+        [RelayCommand]
+        private void SwitchToMainMenu()
         {
-            Application.Current.MainWindow.DataContext = new MainMenuViewModel(_appDbContext);
+            var mainMenuViewModel = ((App)Application.Current).ServiceProvider.GetService<MainMenuViewModel>();
+            Application.Current.MainWindow.DataContext = mainMenuViewModel;
         }
 
-        private async Task DeleteDocumentAsync()
+        [RelayCommand]
+        private void DeleteDocument()
         {
-            if(_selectedDocument != null)
+            if (SelectedDocument != null)
             {
                 string message = $"Are you sure you want to delete this document?\n\n" +
-                                    $"Id: {_selectedDocument.Id}\n" +
-                                    $"Type: {_selectedDocument.Type}\n" +
-                                    $"First name: {_selectedDocument.FirstName}\n" +
-                                    $"Last name: {_selectedDocument.LastName}\n" +
-                                    $"City: {_selectedDocument.City}";
+                                    $"Id: {SelectedDocument.Id}\n" +
+                                    $"Type: {SelectedDocument.Type}\n" +
+                                    $"First name: {SelectedDocument.FirstName}\n" +
+                                    $"Last name: {SelectedDocument.LastName}\n" +
+                                    $"City: {SelectedDocument.City}";
 
                 var result = MessageBox.Show(message, "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.OK)
                 {
                     try
                     {
-                        _appDbContext.DocumentItems.RemoveRange(_appDbContext.DocumentItems.Where(d => d.DocumentId == _selectedDocument.Id)); //Remove all item assigned to document
-                        _appDbContext.Documents.Remove(_selectedDocument);
-                        await _appDbContext.SaveChangesAsync();
+                        _documentDbService.Delete(SelectedDocument);
                     }
-                    catch
+                    catch(EntityNotFoundException error)
                     {
-                        MessageBox.Show("Failed to delete Document.");
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        RefreshData();
+                        return;
+                    }
+                    catch (DatabaseConnectionException error)
+                    {
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        SwitchToMainMenu();
+                        return;
+                    }
+                    catch(Exception error)
+                    {
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     MessageBox.Show("Document deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshDataAsync();
+                    RefreshData();
                 }
                 else
                 {
-                    return; // Exit function if Cancel is clicked
+                    return;
                 }
+            }
+            else
+            {
+                MessageBox.Show("No document selected for deletion.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        [RelayCommand]
         private void ShowDocumentDetails()
         {
             if (_selectedDocument != null)
             {
                 var detailsDialog = new DocumentsItemDialogView();
-                var detailsDialogViewModel = new DocumentsItemDialogViewModel(_appDbContext, _selectedDocument, detailsDialog);
+                var detailsDialogViewModel = new DocumentsItemDialogViewModel(new AppDbContext(), _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
                 detailsDialogViewModel.LoadItemsAsync();
                 detailsDialog.ShowDialog();
             }
+            else
+            {
+                MessageBox.Show("No document selected for deletion.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
         private bool CanShowDocumentDetails()
         {
             return _selectedDocument != null;
         }
+
         //FILTERS FUNCTION 
-        private async Task ApplayFiltersAsync()
+        [RelayCommand]
+        private void ApplayFilters()
         {
-            IQueryable<Documents> query = _appDbContext.Documents.AsQueryable();
-            if (SelectedDocumentType != DocumentTypeFilters.All )
+            IQueryable<Documents> query = _documents.AsQueryable();
+            if (DocumentDisplayFilters.SelectedDocumentType != DocumentTypeFilters.All)
             {
-                DocumentType documentType = (DocumentType)SelectedDocumentType;
+                DocumentType documentType = (DocumentType)DocumentDisplayFilters.SelectedDocumentType;
                 query = query.Where(d => d.Type == documentType);
             }
-            if (!string.IsNullOrEmpty(_firstNameFilter))
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.FirstNameFilter))
             {
-                query = query.Where(d => d.FirstName.Contains(_firstNameFilter));
+                query = query.Where(d => d.FirstName.Contains(DocumentDisplayFilters.FirstNameFilter));
             }
-            if (!string.IsNullOrEmpty(_lastNameFilter))
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.LastNameFilter))
             {
-                query = query.Where(d => d.LastName.Contains(_lastNameFilter));
+                query = query.Where(d => d.LastName.Contains(DocumentDisplayFilters.LastNameFilter));
             }
-            if (!string.IsNullOrEmpty(_cityFilter))
+            if (!string.IsNullOrEmpty(DocumentDisplayFilters.CityFilter))
             {
-                query = query.Where(d => d.City.Contains(_cityFilter));
+                query = query.Where(d => d.City.Contains(DocumentDisplayFilters.CityFilter));
             }
-            if (StartDateFilter <= EndDateFilter) 
+            if (DocumentDisplayFilters.StartDateFilter <= DocumentDisplayFilters.EndDateFilter)
             {
-                if (StartDateFilter != DateTime.MinValue)
+                if (DocumentDisplayFilters.StartDateFilter != DateTime.MinValue)
                 {
-                    query = query.Where(d => d.Date >= StartDateFilter);
+                    query = query.Where(d => d.Date >= DocumentDisplayFilters.StartDateFilter);
                 }
-                if (EndDateFilter != DateTime.MinValue)
+                if (DocumentDisplayFilters.EndDateFilter != DateTime.MinValue)
                 {
-                    query = query.Where(d => d.Date <= EndDateFilter);
+                    query = query.Where(d => d.Date <= DocumentDisplayFilters.EndDateFilter);
                 }
-                
+
             }else
             {
                 MessageBox.Show("Time interval not set correctly");
                 return;
             }
-            FiltersAreSet = true;
-            FiltersQuery = query;
-            RefreshDataAsync();
-            OnPropertyChanged(nameof(_Documents));
+            _filtersQuery = query;
+            RefreshData();
         }
 
-        private async Task ClearFiltersAsync()
+        [RelayCommand]
+        private void ClearFilters()
         {
-            SelectedDocumentType = DocumentTypeFilters.All;
-            FirstNameFilter = "";
-            LastNameFilter = "";
-            CityFilter = "";
-            StartDateFilter = DateTime.MinValue;
-            EndDateFilter = DateTime.Today;
-            FiltersAreSet = false;
-            FiltersQuery = null;
-            LoadDocumentsAsync();
+            DocumentDisplayFilters.SelectedDocumentType = DocumentTypeFilters.All;
+            DocumentDisplayFilters.FirstNameFilter = "";
+            DocumentDisplayFilters.LastNameFilter = "";
+            DocumentDisplayFilters.CityFilter = "";
+            DocumentDisplayFilters.StartDateFilter = DateTime.MinValue;
+            DocumentDisplayFilters.EndDateFilter = DateTime.Today;
+            _filtersQuery = null;
+            RefreshData();
         }
     }
 }
