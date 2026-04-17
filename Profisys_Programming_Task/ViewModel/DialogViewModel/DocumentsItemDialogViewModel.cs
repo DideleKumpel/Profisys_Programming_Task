@@ -1,59 +1,51 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using Profisys_Programming_Task.Model;
+using Profisys_Programming_Task.Service.DbService;
+using Profisys_Programming_Task.Service.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Input;
-using Profisys_Programming_Task.Model;
 using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.EntityFrameworkCore;
 
 namespace Profisys_Programming_Task.ViewModel.DialogViewModel
 {
-    internal class DocumentsItemDialogViewModel : ObservableObject
+    internal partial class DocumentsItemDialogViewModel : ObservableObject
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly IDocumentItemsDbService _documentItemsDbService;
+        [ObservableProperty]
+        private ObservableCollection<Documents> _currentDocument;
+        [ObservableProperty]
+        private ObservableCollection<DocumentItems> _items;
 
-        public ObservableCollection<Documents> CurrentDocument { get; set; }
-        public ObservableCollection<DocumentItems> Items { get; set; }
-
+        [ObservableProperty]
         private DocumentItems _selectedItem;
-        public DocumentItems SelectedItem
+
+        partial void OnSelectedItemChanged(DocumentItems value)
         {
-            get { return _selectedItem; }
-            set
-            {
-                _selectedItem = value;
-                OnPropertyChanged(nameof(SelectedItem));
-                DeleteItemCommand.NotifyCanExecuteChanged();
-            }
+            deleteItemCommand.NotifyCanExecuteChanged();
         }
 
         private Window _dialog;
 
-        public RelayCommand CloseDialogCommand { get; }
-        public AsyncRelayCommand DeleteItemCommand { get; }
 
-        public DocumentsItemDialogViewModel(AppDbContext appDbContext, Documents Document, Window dialog)
+        public DocumentsItemDialogViewModel(IDocumentItemsDbService itemService, Documents Document, Window dialog)
         {
             _dialog = dialog;
-            _appDbContext = appDbContext;
+            _documentItemsDbService = itemService;
             CurrentDocument = new ObservableCollection<Documents>() { Document };
-            OnPropertyChanged(nameof(CurrentDocument));
-
-            CloseDialogCommand = new RelayCommand(CloseDialog);
-            DeleteItemCommand = new AsyncRelayCommand(DeleteItemAsyn, IsItemSelected);
         }
 
         public async Task LoadItemsAsync()
         {
             try
             {
-                Items = new ObservableCollection<DocumentItems>(await _appDbContext.DocumentItems.Where(d => d.DocumentId == CurrentDocument[0].Id).ToListAsync());
-                OnPropertyChanged(nameof(Items));
-
+                List<DocumentItems> documentItems = await _documentItemsDbService.GetByDocumentIdAsync(CurrentDocument[0].Id);
+                Items = new ObservableCollection<DocumentItems>(documentItems);
             }
             catch (Exception e)
             {
@@ -61,8 +53,8 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
                 CloseDialog();
             }
         }
-
-        public async Task DeleteItemAsyn()
+        [RelayCommand(CanExecute = nameof(IsItemSelected))]
+        private async Task DeleteItemAsync()
         {
             if (SelectedItem != null) {
                 string message = $"Are you sure you want to delete this item?\n\n" +
@@ -77,14 +69,27 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
                 {
                     try
                     {
-                        _appDbContext.DocumentItems.Remove(SelectedItem);
-                        await _appDbContext.SaveChangesAsync();
-                    } catch {
-                        MessageBox.Show("Failed to delete item.");
+                        await _documentItemsDbService.DeleteAsync(SelectedItem);
+                    }
+                    catch (EntityNotFoundException error)
+                    {
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        await LoadItemsAsync();
+                        return;
+                    }
+                    catch (DatabaseConnectionException error)
+                    {
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        CloseDialog();
+                        return;
+                    }
+                    catch (Exception error)
+                    {
+                        MessageBox.Show(error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     MessageBox.Show("Item deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadItemsAsync();
+                    await LoadItemsAsync();
                 }
                 else
                 {
@@ -104,8 +109,8 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
                 return true;
             }
         }
-
-        public void CloseDialog()
+        [RelayCommand]
+        private void CloseDialog()
         {
             _dialog.Close();
         }

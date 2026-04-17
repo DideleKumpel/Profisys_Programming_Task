@@ -15,7 +15,6 @@ namespace Profisys_Programming_Task.ViewModel
     internal partial class DataViewModel : ObservableObject
     {
         //SERVICES
-        private readonly IDbService<DocumentItems> _documentItemsDbService;
         private readonly IDbService<Documents> _documentDbService;
         private ObservableCollection<Documents> _documents;
 
@@ -38,10 +37,9 @@ namespace Profisys_Programming_Task.ViewModel
         private DocumentFilters _documentDisplayFilters = new DocumentFilters();
 
         //CONSTRUCTOR
-        public DataViewModel(IDbService<Documents> docService, IDbService<DocumentItems> itemService)
+        public DataViewModel(IDbService<Documents> docService)
         {
             _documentDbService = docService;
-            _documentItemsDbService = itemService;
         }
 
         private async Task FetchDocumentsAsync()
@@ -155,7 +153,8 @@ namespace Profisys_Programming_Task.ViewModel
             if (_selectedDocument != null)
             {
                 var detailsDialog = new DocumentsItemDialogView();
-                var detailsDialogViewModel = new DocumentsItemDialogViewModel(new AppDbContext(), _selectedDocument, detailsDialog);
+                IDocumentItemsDbService documentItemsDbService = ((App)Application.Current).ServiceProvider.GetService<IDocumentItemsDbService>();
+                var detailsDialogViewModel = new DocumentsItemDialogViewModel(documentItemsDbService, _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
                 await detailsDialogViewModel.LoadItemsAsync();

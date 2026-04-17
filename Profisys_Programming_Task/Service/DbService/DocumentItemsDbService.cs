@@ -4,7 +4,8 @@ using Profisys_Programming_Task.Service.Exceptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
-    internal class DocumentItemsDbService : BaseDbService<DocumentItems>
+    
+    internal class DocumentItemsDbService : BaseDbService<DocumentItems>, IDocumentItemsDbService
     {
         public DocumentItemsDbService(AppDbContext appDbContext) : base(appDbContext)
         {
@@ -19,6 +20,24 @@ namespace Profisys_Programming_Task.Service.DbService
                 if (documentItemsFound == null)
                 {
                     throw new EntityNotFoundException("DocumentItems", id);
+                }
+                return documentItemsFound;
+            }
+            catch (Exception error)
+            {
+                HandleException(error);
+                throw;
+            }
+        }
+
+        public async Task<List<DocumentItems>> GetByDocumentIdAsync(int documentId)
+        {
+            try
+            {
+                List<DocumentItems> documentItemsFound = await _appDbContext.DocumentItems.Where(item => item.DocumentId == documentId).ToListAsync();
+                if (documentItemsFound == null)
+                {
+                    throw new EntityNotFoundException("DocumentItems", documentId);
                 }
                 return documentItemsFound;
             }
