@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Profisys_Programming_Task.Service.Import
 {
-    internal interface IImportService<T> where T : class
+    internal interface ImportService<T> where T : class
     {
-        public List<T> ImportDocumentsFromCsv(string filePath);
         public Task<List<T>> ImportDocumentsFromCsvAsync(string filePath);
     }
 }
