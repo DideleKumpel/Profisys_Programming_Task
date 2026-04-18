@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Win32;
 using Profisys_Programming_Task.Model;
@@ -68,7 +69,8 @@ namespace Profisys_Programming_Task.ViewModel
         [RelayCommand]
         private void BackToMenu()
         {
-            Application.Current.MainWindow.DataContext = new MainMenuViewModel();
+            var mainMenuViewModel = ((App)Application.Current).ServiceProvider.GetService<MainMenuViewModel>();
+            Application.Current.MainWindow.DataContext = mainMenuViewModel;
         }
 
         [RelayCommand]
