@@ -97,7 +97,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 throw new ArgumentNullException("items");
             }
-            BeginTransaction();
+            await BeginTransactionAsync();
             int succes = 0;
             foreach (DocumentItems item in items)
             {
@@ -111,12 +111,12 @@ namespace Profisys_Programming_Task.Service.DbService
                     _appDbContext.Entry(item).State = EntityState.Detached;
                     if (CancelOnError)
                     {
-                        RollbackTransaction();
+                        await RollbackTransactionAsync();
                         HandleException(error);
                     }
                 }
             }
-            CommitTransaction(false);
+            await CommitTransactionAsync(false);
             return succes;
         }
 
@@ -172,7 +172,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 throw new ArgumentException(nameof(items));
             }
-            BeginTransaction();
+            await BeginTransactionAsync();
             int succes = 0;
             foreach (DocumentItems item in items)
             {
@@ -186,12 +186,12 @@ namespace Profisys_Programming_Task.Service.DbService
                     _appDbContext.Entry(item).State = EntityState.Unchanged;
                     if (CancelOnError)
                     {
-                        RollbackTransaction();
+                        await RollbackTransactionAsync();
                         HandleException(error);
                     }
                 }
             }
-            CommitTransaction(false);
+            await CommitTransactionAsync(false);
             return succes;
         }
 
@@ -231,7 +231,7 @@ namespace Profisys_Programming_Task.Service.DbService
             {
                 throw new ArgumentException(nameof(items));
             }
-            BeginTransaction();
+            await BeginTransactionAsync();
             int succes = 0;
             foreach (DocumentItems item in items)
             {
@@ -245,12 +245,12 @@ namespace Profisys_Programming_Task.Service.DbService
                     _appDbContext.Entry(item).State = EntityState.Unchanged;
                     if (CancelOnError)
                     {
-                        RollbackTransaction();
+                        await RollbackTransactionAsync();
                         HandleException(error);
                     }
                 }
             }
-            CommitTransaction(false);
+            await CommitTransactionAsync(false);
             return succes;
         }
 

@@ -19,8 +19,8 @@
         Task<int> DeleteManyAsync(List<T> items, bool CancelOnError);
 
         //Transations
-        void BeginTransaction();
-        void CommitTransaction(bool SaveChanges = true);
-        void RollbackTransaction();
+        Task BeginTransactionAsync();
+        Task CommitTransactionAsync(bool SaveChanges = true);
+        Task RollbackTransactionAsync();
     }
 }

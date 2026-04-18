@@ -61,12 +61,12 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public virtual void BeginTransaction()
+        public virtual async Task BeginTransactionAsync()
         {
             _transaction = _appDbContext.Database.BeginTransaction();
         }
 
-        public virtual void CommitTransaction(bool SaveChanges = true)
+        public virtual async Task CommitTransactionAsync(bool SaveChanges = true)
         {
             try
             {
@@ -74,17 +74,17 @@ namespace Profisys_Programming_Task.Service.DbService
                 {
                     _appDbContext.SaveChanges();
                 }
-                _transaction?.Commit();
+                await _transaction?.CommitAsync();
             }
             catch
             {
-                _transaction?.Rollback();
+                await RollbackTransactionAsync();
                 throw;
             }
         }
-        public virtual void RollbackTransaction()
+        public virtual async Task RollbackTransactionAsync()
         {
-            _transaction?.Rollback();
+            await _transaction?.RollbackAsync();
         }
         public virtual Task<T> AddAsync(T item)
         {
