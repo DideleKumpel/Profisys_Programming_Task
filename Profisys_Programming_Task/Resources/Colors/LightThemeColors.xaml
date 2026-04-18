@@ -5,7 +5,7 @@
     <Color x:Key="SecondaryColor">#b4876d</Color>
     <Color x:Key="AccentColor">#64676E</Color>
     <Color x:Key="BackgroundColor">#E5E4E2</Color>
-    <Color x:Key="SecondaryBackgroundColor">#C0C0C0</Color>
+    <Color x:Key="SecondaryBackgroundColor">#F2F0EF</Color>
     <Color x:Key="ErrorColor">#FFB71C1C</Color>
     <Color x:Key="SuccesColor">#00b93f</Color>
 

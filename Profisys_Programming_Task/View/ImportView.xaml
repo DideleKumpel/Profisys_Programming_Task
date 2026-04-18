@@ -38,6 +38,7 @@
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" FontSize="13" HorizontalAlignment="Center" Height="30" VerticalAlignment="Top">Succes list</Label>
+            
             <DataGrid Grid.Row="1" Margin="15,15,15,10"
                     ItemsSource="{Binding ImportedDocumentItems}" 
                     Visibility="{Binding DocumentItemsDataGridVisibility}"
@@ -52,7 +53,7 @@
                     <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <!-- DataGrid for Documents -->
+            
             <DataGrid Grid.Row="1" Margin="15,15,15,10"
                   ItemsSource="{Binding ImportedDocuments}"
                   Visibility="{Binding DocumetnsDataGridVisibility}"
@@ -68,7 +69,9 @@
                     <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
                 </DataGrid.Columns>
             </DataGrid>
+            
             <Label Grid.Row="2" FontSize="13" HorizontalAlignment="Center">Error list</Label>
+            
             <DataGrid Grid.Row="3" Margin="15"
                 ItemsSource="{Binding FailedImportedDocumentItems}" 
                 Visibility="{Binding DocumentItemsDataGridVisibility}"
@@ -83,7 +86,7 @@
                     <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <!-- DataGrid for Documents -->
+            
             <DataGrid Grid.Row="3" Margin="15,15,15,15"
                 ItemsSource="{Binding FailedImportedDocuemnts}"
                 Visibility="{Binding DocumetnsDataGridVisibility}"

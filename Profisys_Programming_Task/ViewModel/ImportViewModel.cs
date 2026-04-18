@@ -106,7 +106,9 @@ namespace Profisys_Programming_Task.ViewModel
                 MessageBox.Show("Please select a CSV file to import.");
                 return;
             }
-            IsImporting = true; //flag up
+
+            IsImporting = true;
+            _cancellation = new CancellationTokenSource();
             CancellationToken cancellationToken = _cancellation.Token;
 
             List<Documents> loadedDocuments = new();
@@ -136,13 +138,15 @@ namespace Profisys_Programming_Task.ViewModel
                     return;
                 }      
             }
-            catch(Exception error)
+            catch(OperationCanceledException)
+            {
+                MessageBox.Show("Import has been cancelled.");
+            }
+            catch (Exception error)
             {
                 HandleImportException(error);
-                IsImporting = false;
-                return;
             }
-            IsImporting = false; //flag down
+            IsImporting = false;
         }
 
         private async Task AddImportedDocumentsToDb(List<Documents> documents, CancellationToken cancellationToken)
