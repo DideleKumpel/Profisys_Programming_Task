@@ -27,7 +27,7 @@ namespace Profisys_Programming_Task.Service.Import
                 throw new InvalidDataException("Could not read CSV headers");
             }
             string[] headers = csv.HeaderRecord;
-            if (!IsValidDocumentsCsv(headers)) //documents table
+            if (!IsValidFormat(headers)) //documents table
             {
                 throw new InvalidDataException("Invalid CSV format for documents.");
             }
@@ -41,8 +41,27 @@ namespace Profisys_Programming_Task.Service.Import
             return importedItems;
         }
 
+        public override async Task<bool> CanImportAsync(string filePath)
+        {
+            try
+            {
+                ValidateCsvFilePath(filePath);
 
-        private bool IsValidDocumentsCsv(string[] headers)
+                using StreamReader reader = new StreamReader(filePath);
+                using CsvReader csv = new CsvReader(reader, _csvConfiguration);
+
+                await csv.ReadAsync();
+                csv.ReadHeader();
+
+                return IsValidFormat(csv.HeaderRecord);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        protected override bool IsValidFormat(string[] headers)
         {
             return headers.Contains("Id") && headers.Contains("Type") && headers.Contains("Date") && headers.Contains("FirstName") && headers.Contains("LastName") && headers.Contains("City");
         }

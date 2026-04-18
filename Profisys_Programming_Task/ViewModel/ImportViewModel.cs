@@ -112,23 +112,29 @@ namespace Profisys_Programming_Task.ViewModel
             List<Documents> loadedDocuments = new();
             List<DocumentItems> loadedDocumentItems = new();
             bool importedDocuments = false;
-            try
-            {
-                loadedDocuments = await TryImportDocuments(cancellationToken);
-                loadedDocuments = ShowImportPreview(loadedDocuments, "Document Import Preview");
-                DocumentItemsDataGridVisibility = Visibility.Collapsed;
-                DocumetnsDataGridVisibility = Visibility.Visible;
-                await AddImportedDocumentsToDb(loadedDocuments, cancellationToken);
-                
-            }
-            catch (InvalidDataException error)
-            {
-                loadedDocumentItems = await TryImportDocumentItems(cancellationToken);
-                loadedDocumentItems = ShowImportPreview(loadedDocumentItems, "Document Items Import Preview");
-                DocumetnsDataGridVisibility = Visibility.Collapsed;
-                DocumentItemsDataGridVisibility = Visibility.Visible;
-                await AddImportedDocumentItemsToDb(loadedDocumentItems, cancellationToken);
-                
+            try {
+                if(await _documentsImportService.CanImportAsync(FilePath)) 
+                {
+                    loadedDocuments = await TryImportDocuments(cancellationToken);
+                    loadedDocuments = ShowImportPreview(loadedDocuments, "Document Import Preview");
+                    DocumentItemsDataGridVisibility = Visibility.Collapsed;
+                    DocumetnsDataGridVisibility = Visibility.Visible;
+                    await AddImportedDocumentsToDb(loadedDocuments, cancellationToken);
+                }
+                else if(await _documentItemsImportService.CanImportAsync(FilePath))
+                {
+                    loadedDocumentItems = await TryImportDocumentItems(cancellationToken);
+                    loadedDocumentItems = ShowImportPreview(loadedDocumentItems, "Document Items Import Preview");
+                    DocumetnsDataGridVisibility = Visibility.Collapsed;
+                    DocumentItemsDataGridVisibility = Visibility.Visible;
+                    await AddImportedDocumentItemsToDb(loadedDocumentItems, cancellationToken);
+                }
+                else
+                {
+                    MessageBox.Show("The selected file does not match the expected format for either Documents or Document Items.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    IsImporting = false;
+                    return;
+                }      
             }
             catch(Exception error)
             {

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Profisys_Programming_Task.Service.Import
 {
-    internal class ImportServiceBase<T>: IImportService<T> where T : class
+    internal class ImportServiceBase<T> : IImportService<T> where T : class
     {
         protected CsvConfiguration _csvConfiguration;
 
@@ -44,6 +44,16 @@ namespace Profisys_Programming_Task.Service.Import
             }
         }
         public virtual async Task<List<T>> ImportFromCsvAsync(string filePath, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual async Task<bool> CanImportAsync(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual bool IsValidFormat(string[] headers)
         {
             throw new NotImplementedException();
         }
