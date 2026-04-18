@@ -58,6 +58,7 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
         private void CancelImport()
         {
             _dialog.DialogResult = false;
+            Items.Clear();
             _dialog.Close();
         }
     }

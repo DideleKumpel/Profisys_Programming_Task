@@ -119,7 +119,7 @@ namespace Profisys_Programming_Task.ViewModel
                 await AddImportedDocumentsToDb(loadedDocuments, cancellationToken);
                 
             }
-            catch (InvalidDataException Error)
+            catch (InvalidDataException error)
             {
                 loadedDocumentItems = await TryImportDocumentItems(cancellationToken);
                 loadedDocumentItems = ShowImportPreview(loadedDocumentItems, "Document Items Import Preview");
