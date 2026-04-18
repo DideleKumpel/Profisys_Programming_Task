@@ -29,6 +29,8 @@ namespace Profisys_Programming_Task.Service.DbService
                 {
                     switch (sqlException.Number)
                     {
+                        case 515:
+                            throw new DatabaseException("Missing required data in one of the columns.", sqlException);
                         case 2627:
                         case 2601:
                             throw new UniqueConstraintException(sqlException);

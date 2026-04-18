@@ -59,10 +59,7 @@ namespace Profisys_Programming_Task.Migrations
             modelBuilder.Entity("Profisys_Programming_Task.Model.Documents", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
                         .IsRequired()

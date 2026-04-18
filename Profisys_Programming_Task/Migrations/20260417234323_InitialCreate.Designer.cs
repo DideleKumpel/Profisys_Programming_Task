@@ -12,7 +12,7 @@ using Profisys_Programming_Task;
 namespace Profisys_Programming_Task.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250401000225_InitialCreate")]
+    [Migration("20260417234323_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -62,10 +62,7 @@ namespace Profisys_Programming_Task.Migrations
             modelBuilder.Entity("Profisys_Programming_Task.Model.Documents", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
                         .IsRequired()
@@ -93,13 +90,11 @@ namespace Profisys_Programming_Task.Migrations
 
             modelBuilder.Entity("Profisys_Programming_Task.Model.DocumentItems", b =>
                 {
-                    b.HasOne("Profisys_Programming_Task.Model.Documents", "Document")
+                    b.HasOne("Profisys_Programming_Task.Model.Documents", null)
                         .WithMany()
                         .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Document");
                 });
 #pragma warning restore 612, 618
         }

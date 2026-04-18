@@ -12,13 +12,21 @@ namespace Profisys_Programming_Task.Service.Import
 
         public DocumentItemsImportService(CsvConfiguration csvConfiguration) : base(csvConfiguration) { }
 
-        public override async Task<List<DocumentItems>> ImportFromCsvAsync(string filePath)
+        public override async Task<List<DocumentItems>> ImportFromCsvAsync(string filePath, CancellationToken cancellationToken)
         {
             ValidateCsvFilePath(filePath);
 
             using StreamReader reader = new StreamReader(filePath);
             using CsvReader csv = new CsvReader(reader, _csvConfiguration);
-            csv.ReadHeader();
+            try
+            {
+                await csv.ReadAsync();
+                csv.ReadHeader();
+            }
+            catch
+            {
+                throw new InvalidDataException("Could not read CSV headers");
+            }
             string[] headers = csv.HeaderRecord;
             if (!IsValidDocumentItemsCsv(headers))
             {
@@ -27,6 +35,7 @@ namespace Profisys_Programming_Task.Service.Import
             List<DocumentItems> importedItems = new List<DocumentItems>();
             while (await csv.ReadAsync())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 DocumentItems item = csv.GetRecord<DocumentItems>();
                 importedItems.Add(item);
             }

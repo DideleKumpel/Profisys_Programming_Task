@@ -4,13 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Profisys_Programming_Task.View"
+             xmlns:viewmodel="clr-namespace:Profisys_Programming_Task.ViewModel"
+             d:DataContext="{d:DesignInstance Type=viewmodel:ImportViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1200">
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="16*"></RowDefinition>
-            <RowDefinition Height="19*"></RowDefinition>
-            <RowDefinition Height="65*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Height="75" Width="150" Margin="10" HorizontalAlignment="Left" Command="{Binding BackToMenuCommand}">Back to menu</Button>
         <StackPanel HorizontalAlignment="Right" Margin="10">
@@ -20,48 +22,84 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ChooseFileCommand}">Choose file</Button>
-                <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ImportDataCommand}">Import</Button>
+                <Button Height="40" Width="80" Margin="10" HorizontalAlignment="Left" Command="{Binding ProccesCsvAsycnCommand}">Import</Button>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="10,0">
             <Label FontSize="13" HorizontalAlignment="Center">Import progress</Label>
             <ProgressBar Value="{Binding ImportProgress}" Height="20"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Height="25" Width="50" Margin="5" Command="{Binding CancelImportCommand}" >Cancel</Button>
-                <Button Height="25" Width="50" Margin="5" Command="{Binding AbortImportCommand}">Abort</Button>
-            </StackPanel>
-            <Label FontSize="13" HorizontalAlignment="Center">Data inserted to cloud</Label>
+            <Button Height="25" Width="50" Margin="5" Command="{Binding CancelImportCommand}" >Cancel</Button>
         </StackPanel>
-        <!-- DataGrid for DocumentItems -->
-            <DataGrid Grid.Row="2" Margin="15"
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" FontSize="13" HorizontalAlignment="Center" Height="30" VerticalAlignment="Top">Succes list</Label>
+            <DataGrid Grid.Row="1" Margin="15,15,15,10"
                     ItemsSource="{Binding ImportedDocumentItems}" 
                     Visibility="{Binding DocumentItemsDataGridVisibility}"
                     CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                     AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Document Id" Binding="{Binding DocumentId}" Width="5*"/>
-                <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
-                <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
-                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="15*"/>
-                <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="15*"/>
-                <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <!-- DataGrid for Documents -->
-        <DataGrid Grid.Row="2" Margin="15"
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Document Id" Binding="{Binding DocumentId}" Width="5*"/>
+                    <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
+                    <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="15*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="15*"/>
+                    <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!-- DataGrid for Documents -->
+            <DataGrid Grid.Row="1" Margin="15,15,15,10"
                   ItemsSource="{Binding ImportedDocuments}"
                   Visibility="{Binding DocumetnsDataGridVisibility}"
                   SelectionUnit="FullRow"
                   CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                   AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="15*"/>
-                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='yyyy-MM-dd'}" Width="15*"/>
-                <DataGridTextColumn Header="First name" Binding="{Binding FirstName}" Width="23*"/>
-                <DataGridTextColumn Header="Last name" Binding="{Binding LastName}" Width="22*"/>
-                <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="5*"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="15*"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='yyyy-MM-dd'}" Width="15*"/>
+                    <DataGridTextColumn Header="First name" Binding="{Binding FirstName}" Width="23*"/>
+                    <DataGridTextColumn Header="Last name" Binding="{Binding LastName}" Width="22*"/>
+                    <DataGridTextColumn Header="City" Binding="{Binding City}" Width="20*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Label Grid.Row="2" FontSize="13" HorizontalAlignment="Center">Error list</Label>
+            <DataGrid Grid.Row="3" Margin="15"
+                ItemsSource="{Binding FailedImportedDocumentItems}" 
+                Visibility="{Binding DocumentItemsDataGridVisibility}"
+                CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Document Id" Binding="{Binding DocumentId}" Width="5*"/>
+                    <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
+                    <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="15*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="15*"/>
+                    <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!-- DataGrid for Documents -->
+            <DataGrid Grid.Row="3" Margin="15,15,15,15"
+                ItemsSource="{Binding FailedImportedDocuemnts}"
+                Visibility="{Binding DocumetnsDataGridVisibility}"
+                SelectionUnit="FullRow"
+                CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Item.Id}" Width="5*"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding Item.Type}" Width="10*"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding Item.Date, StringFormat='yyyy-MM-dd'}" Width="10*"/>
+                    <DataGridTextColumn Header="First name" Binding="{Binding Item.FirstName}" Width="20*"/>
+                    <DataGridTextColumn Header="Last name" Binding="{Binding Item.LastName}" Width="20*"/>
+                    <DataGridTextColumn Header="City" Binding="{Binding Item.City}" Width="20*"/>
+                    <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="15*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

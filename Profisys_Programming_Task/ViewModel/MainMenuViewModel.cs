@@ -10,21 +10,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Profisys_Programming_Task.ViewModel
 {
-    internal class MainMenuViewModel : ObservableObject
+    internal partial class MainMenuViewModel : ObservableObject
     {
-        public RelayCommand GoToImportViewCommand { get; }
-        public AsyncRelayCommand GoToDataViewCommand { get; }
         public MainMenuViewModel()
         {
-            GoToDataViewCommand = new AsyncRelayCommand(SwitchToDataView);
-            GoToImportViewCommand = new RelayCommand(SwitchToImportView);
-
         }
+        [RelayCommand]
         private void SwitchToImportView()
         {
-            
+            var importViewModel = ((App)Application.Current).ServiceProvider.GetService<ImportViewModel>();
+            Application.Current.MainWindow.DataContext = importViewModel;
         }
-
+        [RelayCommand]
         private async Task SwitchToDataView()
         {
 

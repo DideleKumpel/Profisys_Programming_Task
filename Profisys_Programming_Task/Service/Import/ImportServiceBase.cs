@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration;
+using System.Globalization;
 using System.IO;
 
 namespace Profisys_Programming_Task.Service.Import
@@ -9,11 +10,11 @@ namespace Profisys_Programming_Task.Service.Import
 
         public ImportServiceBase()
         {
-            _csvConfiguration = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+            _csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
                 MissingFieldFound = null,
-                Delimiter = ","
+                Delimiter = ";"
             };
         }
 
@@ -42,7 +43,7 @@ namespace Profisys_Programming_Task.Service.Import
                 throw new InvalidDataException("Invalid file format. Only CSV files are supported.");
             }
         }
-        public virtual async Task<List<T>> ImportFromCsvAsync(string filePath)
+        public virtual async Task<List<T>> ImportFromCsvAsync(string filePath, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
