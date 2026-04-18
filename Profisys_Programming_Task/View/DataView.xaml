@@ -25,7 +25,7 @@
             
   
         <StackPanel Grid.Row="1" Orientation="Horizontal" Panel.ZIndex="2">
-            <Expander Margin="0,5" Header="Filters" Panel.ZIndex="3">
+            <Expander Margin="0,5" Header="Filters" Panel.ZIndex="3" Height="40">
                 <Canvas>
                     <Border BorderThickness="2" BorderBrush="Black">
                         <Grid Width="700" Height="130" Background="White">
@@ -64,7 +64,7 @@
                     </Border>
                 </Canvas>
             </Expander>
-            <Button Height="30" Margin="30,0,0,0" Command="{Binding RefreshDataCommand}">Resfresh data</Button>
+            <Button Height="40" Margin="30,0,0,0" Command="{Binding RefreshDataCommand}">Resfresh data</Button>
         </StackPanel>
         <DataGrid Grid.Row="2" Margin="15"
               ItemsSource="{Binding DocumentsDisplay}"

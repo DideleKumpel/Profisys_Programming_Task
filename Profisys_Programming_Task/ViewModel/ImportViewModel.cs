@@ -104,7 +104,7 @@ namespace Profisys_Programming_Task.ViewModel
                 MessageBox.Show("Please select a CSV file to import.");
                 return;
             }
-             IsImporting = true; //flag up
+            IsImporting = true; //flag up
             CancellationToken cancellationToken = _cancellation.Token;
 
             List<Documents> loadedDocuments = new();

@@ -40,8 +40,8 @@
                 </DataGrid.Columns>
             </DataGrid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Height="20" Width="50" Command="{Binding DeleteItemCommand}">Delete</Button>
-                <Button Height="20" Width="50" Margin="15,0,0,0" Command="{Binding CloseDialogCommand}">Close</Button>
+                <Button Height="30" Width="50" Command="{Binding DeleteItemCommand}">Delete</Button>
+                <Button Height="30" Width="50" Margin="15,0,0,0" Command="{Binding CloseDialogCommand}">Close</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

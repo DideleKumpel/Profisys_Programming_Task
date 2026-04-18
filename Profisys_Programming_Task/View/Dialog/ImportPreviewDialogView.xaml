@@ -17,9 +17,9 @@
         AutoGenerateColumns="True">
         </DataGrid>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-        <Button Height="20" Width="50" Command="{Binding DeleteItemCommand}">Delete</Button>
-            <Button Height="20" Width="50" Margin="15,0,15,0" Command="{Binding AcceptImportCommand}">Accept</Button>
-            <Button Height="20" Width="50" Command="{Binding CancelImportCommand}">Cancel</Button>
+            <Button Height="30" Width="50" Command="{Binding DeleteItemCommand}">Delete</Button>
+            <Button Height="30" Width="50" Margin="15,0,15,0" Command="{Binding AcceptImportCommand}">Accept</Button>
+            <Button Height="30" Width="50" Command="{Binding CancelImportCommand}">Cancel</Button>
     </StackPanel>
     </StackPanel>
 </Window>

@@ -18,4 +18,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Colors\" />
+    <Folder Include="Resources\Styles\" />
+  </ItemGroup>
+
 </Project>
