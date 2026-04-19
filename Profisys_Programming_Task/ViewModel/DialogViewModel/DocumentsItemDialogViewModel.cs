@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using Profisys_Programming_Task.Model;
 using Profisys_Programming_Task.Service.DbService;
 using Profisys_Programming_Task.Service.Exceptions;
+using Profisys_Programming_Task.Service.Export;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +19,7 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
     internal partial class DocumentsItemDialogViewModel : ObservableObject
     {
         private readonly IDocumentItemsDbService _documentItemsDbService;
+        private readonly DocumentPdfExportService _pdfExportService;
         [ObservableProperty]
         private ObservableCollection<Documents> _currentDocument;
         [ObservableProperty]
@@ -33,12 +36,40 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
         private Window _dialog;
 
 
-        public DocumentsItemDialogViewModel(IDocumentItemsDbService itemService, Documents Document, Window dialog)
+        public DocumentsItemDialogViewModel(IDocumentItemsDbService itemService, DocumentPdfExportService pdfExportService, Documents Document, Window dialog)
         {
             _dialog = dialog;
             _documentItemsDbService = itemService;
+            _pdfExportService = pdfExportService;
             CurrentDocument = new ObservableCollection<Documents>() { Document };
         }
+
+        [RelayCommand(CanExecute = nameof(IsItemsLoaded))]
+        private void ExportToPdf()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "Export to PDF",
+                Filter = "PDF files (*.pdf)|*.pdf",
+                FileName = $"Document_{CurrentDocument[0].Id}_{DateTime.Today:yyyy-MM-dd}.pdf"
+            };
+
+            if (saveFileDialog.ShowDialog() != true) return;
+
+            try
+            {
+                _pdfExportService.Export(CurrentDocument[0], Items.ToList(), saveFileDialog.FileName);
+                MessageBox.Show("PDF exported successfully.", "Success",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Export failed: {ex.Message}", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private bool IsItemsLoaded() => Items != null && Items.Any();
 
         public async Task LoadItemsAsync()
         {
@@ -46,6 +77,7 @@ namespace Profisys_Programming_Task.ViewModel.DialogViewModel
             {
                 List<DocumentItems> documentItems = await _documentItemsDbService.GetByDocumentIdAsync(CurrentDocument[0].Id);
                 Items = new ObservableCollection<DocumentItems>(documentItems);
+                ExportToPdfCommand.NotifyCanExecuteChanged();
             }
             catch (Exception e)
             {

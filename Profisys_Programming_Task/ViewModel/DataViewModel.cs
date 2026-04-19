@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Profisys_Programming_Task.Model;
 using Profisys_Programming_Task.Service.DbService;
 using Profisys_Programming_Task.Service.Exceptions;
+using Profisys_Programming_Task.Service.Export;
 using Profisys_Programming_Task.View.Dialog;
 using Profisys_Programming_Task.ViewModel.DialogViewModel;
 using Profisys_Programming_Task.ViewModel.Filters;
@@ -154,7 +155,8 @@ namespace Profisys_Programming_Task.ViewModel
             {
                 var detailsDialog = new DocumentsItemDialogView();
                 IDocumentItemsDbService documentItemsDbService = ((App)Application.Current).ServiceProvider.GetService<IDocumentItemsDbService>();
-                var detailsDialogViewModel = new DocumentsItemDialogViewModel(documentItemsDbService, _selectedDocument, detailsDialog);
+
+                var detailsDialogViewModel = new DocumentsItemDialogViewModel(documentItemsDbService, new DocumentPdfExportService(), _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
                 await detailsDialogViewModel.LoadItemsAsync();
