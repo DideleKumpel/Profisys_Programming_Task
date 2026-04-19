@@ -5,6 +5,7 @@
         public Task<T> GetByIdAsync(int id);
         public Task<List<T>> GetAllAsync();
         Task<bool> ExistsAsync(int id);
+        Task<int> GetCountAsync();
 
         //Create
         Task<T> AddAsync(T item);

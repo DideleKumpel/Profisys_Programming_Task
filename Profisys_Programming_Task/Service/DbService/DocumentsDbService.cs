@@ -55,6 +55,19 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
+        public override async Task<int> GetCountAsync()
+        {
+            try
+            {
+                return await _appDbContext.Documents.CountAsync();
+            }
+            catch (Exception error)
+            {
+                HandleException(error);
+                throw;
+            }
+        }
+
         //Insert
         public override async Task<Documents> AddAsync(Documents item)
         {

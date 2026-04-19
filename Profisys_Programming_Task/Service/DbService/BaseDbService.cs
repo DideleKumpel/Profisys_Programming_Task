@@ -82,6 +82,12 @@ namespace Profisys_Programming_Task.Service.DbService
                 throw;
             }
         }
+
+        public virtual Task<int> GetCountAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public virtual async Task RollbackTransactionAsync()
         {
             await _transaction?.RollbackAsync();
