@@ -29,5 +29,13 @@ namespace Profisys_Programming_Task.ViewModel
             dataViewModel.RefreshDataCommand.Execute(null);
             Application.Current.MainWindow.DataContext = dataViewModel;
         }
+
+        [RelayCommand]
+        private async Task SwitchToExportView()
+        {
+            var exportViewModel = ((App)Application.Current).ServiceProvider.GetService<ExportViewModel>();
+            await exportViewModel.LoadCountsAsync();
+            Application.Current.MainWindow.DataContext = exportViewModel;
+        }
     }
 }

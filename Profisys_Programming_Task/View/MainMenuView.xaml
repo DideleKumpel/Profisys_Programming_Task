@@ -15,6 +15,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Width="150" Height="75" FontSize="16" Command="{Binding SwitchToDataViewCommand}">View Data</Button>
                 <Button Width="150" Height="75" FontSize="16" Margin="50, 0, 0,0" Command="{Binding SwitchToImportViewCommand}">Import data</Button>
+                <Button Width="150" Height="75" FontSize="16" Margin="50, 0, 0,0" Command="{Binding SwitchToExportViewCommand}">Export data</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -17,9 +17,14 @@ namespace Profisys_Programming_Task.ViewModel
         private readonly IDocumentItemsDbService _documentItemsDbService;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DocumentsCountText))]
         public int _docuemntsDbCount;
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DocumentItemsCountText))]
         public int _documentItemsDbCount;
+
+        public string DocumentsCountText => $"Records in database: {DocuemntsDbCount}";
+        public string DocumentItemsCountText => $"Records in database: {DocumentItemsDbCount}";
 
         public ExportViewModel(IExportService<Documents> documentsExportService, IExportService<DocumentItems> documentItemsExportService, IDbService<Documents> documentsDbService, IDocumentItemsDbService documentItemsDbService)
         {
@@ -74,7 +79,7 @@ namespace Profisys_Programming_Task.ViewModel
         }
 
         [RelayCommand]
-        private void BackToMenu()
+        private void SwitchToMainMenu()
         {
             var mainMenuViewModel = ((App)Application.Current).ServiceProvider.GetService<MainMenuViewModel>();
             Application.Current.MainWindow.DataContext = mainMenuViewModel;

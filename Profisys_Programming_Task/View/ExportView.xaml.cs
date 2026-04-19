@@ -3,11 +3,11 @@
 namespace Profisys_Programming_Task.View
 {
     /// <summary>
-    /// Logika interakcji dla klasy ImportView.xaml
+    /// Interaction logic for ExportView.xaml
     /// </summary>
-    public partial class ImportView : UserControl
+    public partial class ExportView : UserControl
     {
-        public ImportView()
+        public ExportView()
         {
             InitializeComponent();
         }
