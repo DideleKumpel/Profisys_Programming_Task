@@ -33,6 +33,7 @@ namespace Profisys_Programming_Task
             services.AddScoped<IImportService<DocumentItems>, DocumentItemsImportService>();
             services.AddScoped<IExportService<Documents>, ExportServiceBase<Documents>>();
             services.AddScoped<IExportService<DocumentItems>, DocumentItemsExportService>();
+            services.AddScoped<DocumentPdfExportService>();
 
             services.AddTransient<MainMenuViewModel>();
             services.AddTransient<DataViewModel>();

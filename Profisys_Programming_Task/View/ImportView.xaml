@@ -78,12 +78,13 @@
                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Document Id" Binding="{Binding DocumentId}" Width="5*"/>
-                    <DataGridTextColumn Header="Ordinal" Binding="{Binding Ordinal}" Width="5*"/>
-                    <DataGridTextColumn Header="Product" Binding="{Binding Product}" Width="15*"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="15*"/>
-                    <DataGridTextColumn Header="Price" Binding="{Binding Price}" Width="15*"/>
-                    <DataGridTextColumn Header="TaxRate" Binding="{Binding TaxRate}" Width="15*"/>
+                    <DataGridTextColumn Header="Document Id" Binding="{Binding Item.DocumentId}" Width="2*"/>
+                    <DataGridTextColumn Header="Ordinal" Binding="{Binding Item.Ordinal}" Width="2*"/>
+                    <DataGridTextColumn Header="Product" Binding="{Binding Item.Product}" Width="10*"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Item.Quantity}" Width="5*"/>
+                    <DataGridTextColumn Header="Price" Binding="{Binding Item.Price}" Width="5*"/>
+                    <DataGridTextColumn Header="TaxRate" Binding="{Binding Item.TaxRate}" Width="2*"/>
+                    <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="15*"/>
                 </DataGrid.Columns>
             </DataGrid>
             
@@ -94,13 +95,13 @@
                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Item.Id}" Width="5*"/>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Item.Id}" Width="3*"/>
                     <DataGridTextColumn Header="Type" Binding="{Binding Item.Type}" Width="10*"/>
                     <DataGridTextColumn Header="Date" Binding="{Binding Item.Date, StringFormat='yyyy-MM-dd'}" Width="10*"/>
-                    <DataGridTextColumn Header="First name" Binding="{Binding Item.FirstName}" Width="20*"/>
-                    <DataGridTextColumn Header="Last name" Binding="{Binding Item.LastName}" Width="20*"/>
-                    <DataGridTextColumn Header="City" Binding="{Binding Item.City}" Width="20*"/>
-                    <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="15*"/>
+                    <DataGridTextColumn Header="First name" Binding="{Binding Item.FirstName}" Width="10*"/>
+                    <DataGridTextColumn Header="Last name" Binding="{Binding Item.LastName}" Width="10*"/>
+                    <DataGridTextColumn Header="City" Binding="{Binding Item.City}" Width="10*"/>
+                    <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="30*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

@@ -5,7 +5,7 @@ using Profisys_Programming_Task.Service.Exceptions;
 
 namespace Profisys_Programming_Task.Service.DbService
 {
-    internal class BaseDbService<T> : IDbService<T> where T : class
+    internal abstract class BaseDbService<T> : IDbService<T> where T : class
     {
         protected readonly AppDbContext _appDbContext;
         private IDbContextTransaction? _transaction;
@@ -46,6 +46,9 @@ namespace Profisys_Programming_Task.Service.DbService
                     }
                 }
                 throw new DatabaseException("A database update error occurred.", dbUpdateException);
+            }else if (exception is InvalidOperationException sqlException)
+            {
+                throw new UniqueConstraintException(sqlException);
             }
             else if(exception is DbUpdateConcurrencyException dbUpdateConcurrencyException)
             {
@@ -83,67 +86,31 @@ namespace Profisys_Programming_Task.Service.DbService
             }
         }
 
-        public virtual Task<int> GetCountAsync()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public virtual async Task RollbackTransactionAsync()
         {
             await _transaction?.RollbackAsync();
         }
-        public virtual Task<T> AddAsync(T item)
-        {
-            throw new NotImplementedException();
-        }
 
-        public virtual Task<int> AddManyAsync(List<T> items, bool CancelOnError)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<int> GetCountAsync();
+        public abstract Task<T> AddAsync(T item);
 
-        public virtual Task<bool> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<int> AddManyAsync(List<T> items, bool CancelOnError);
 
-        public virtual Task<bool> DeleteAsync(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<bool> DeleteAsync(int id);
 
-        public virtual Task<int> DeleteManyAsync(List<T> items, bool CancelOnError)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual Task<bool> ExistsAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<bool> DeleteAsync(T item);
 
-        public virtual Task<List<T>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<int> DeleteManyAsync(List<T> items, bool CancelOnError);
+        public abstract Task<bool> ExistsAsync(int id);
 
-        public virtual Task<T> GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<List<T>> GetAllAsync();
 
-        public virtual Task<bool> UpdateAsync(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<T> GetByIdAsync(int id);
 
-        public virtual Task<bool> UpdateAsync(int id, T item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<int> UpdateManyAsync(List<T> items, bool CancelOnError)
-        {
-            throw new NotImplementedException();
-        }  
+        public abstract Task<bool> UpdateAsync(T item);
+        public abstract Task<bool> UpdateAsync(int id, T item);
+        public abstract Task<int> UpdateManyAsync(List<T> items, bool CancelOnError);
     }
 }

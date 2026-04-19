@@ -155,8 +155,9 @@ namespace Profisys_Programming_Task.ViewModel
             {
                 var detailsDialog = new DocumentsItemDialogView();
                 IDocumentItemsDbService documentItemsDbService = ((App)Application.Current).ServiceProvider.GetService<IDocumentItemsDbService>();
+                DocumentPdfExportService documentPdfExportService = ((App)Application.Current).ServiceProvider.GetService<DocumentPdfExportService>();
 
-                var detailsDialogViewModel = new DocumentsItemDialogViewModel(documentItemsDbService, new DocumentPdfExportService(), _selectedDocument, detailsDialog);
+                var detailsDialogViewModel = new DocumentsItemDialogViewModel(documentItemsDbService, documentPdfExportService, _selectedDocument, detailsDialog);
                 detailsDialog.DataContext = detailsDialogViewModel;
 
                 await detailsDialogViewModel.LoadItemsAsync();

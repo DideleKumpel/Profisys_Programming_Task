@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Profisys_Programming_Task.Service.Import
 {
-    internal class ImportServiceBase<T> : IImportService<T> where T : class
+    internal abstract class ImportServiceBase<T> : IImportService<T> where T : class
     {
         protected CsvConfiguration _csvConfiguration;
 
@@ -43,19 +43,10 @@ namespace Profisys_Programming_Task.Service.Import
                 throw new InvalidDataException("Invalid file format. Only CSV files are supported.");
             }
         }
-        public virtual async Task<List<T>> ImportFromCsvAsync(string filePath, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<List<T>> ImportFromCsvAsync(string filePath, CancellationToken cancellationToken);
 
-        public virtual async Task<bool> CanImportAsync(string filePath)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<bool> CanImportAsync(string filePath);
 
-        protected virtual bool IsValidFormat(string[] headers)
-        {
-            throw new NotImplementedException();
-        }
+        protected abstract bool IsValidFormat(string[] headers);
     }
 }
