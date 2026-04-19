@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:Profisys_Programming_Task.ViewModel.DialogViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:DocumentsItemDialogViewModel}"
         mc:Ignorable="d"
-            Title="DocumentsItemDialogView" Height="450" Width="800">
+            Title="DocumentsItemDialogView" Height="500" Width="800">
     <Grid>
         <StackPanel Orientation="Vertical">
             <Label FontSize="24" HorizontalAlignment="Center" Margin="5">Current dcoument</Label>
