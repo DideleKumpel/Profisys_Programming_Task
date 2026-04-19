@@ -10,7 +10,7 @@ namespace Profisys_Programming_Task.Service.Import
 
         public ImportServiceBase()
         {
-            _csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            _csvConfiguration = new CsvConfiguration(new System.Globalization.CultureInfo("pl-PL"))
             {
                 HasHeaderRecord = true,
                 MissingFieldFound = null,
