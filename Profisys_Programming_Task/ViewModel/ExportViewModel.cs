@@ -5,11 +5,6 @@ using Microsoft.Win32;
 using Profisys_Programming_Task.Model;
 using Profisys_Programming_Task.Service.DbService;
 using Profisys_Programming_Task.Service.Export;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Profisys_Programming_Task.ViewModel
